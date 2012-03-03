@@ -25,10 +25,9 @@ THE SOFTWARE.
 #ifdef _MSC_VER
   #define _SCL_SECURE_NO_WARNINGS
   #define ELFIO_NO_INTTYPES
-#endif
-
-#ifndef PRIx64
-#define PRIx64 "llx"
+  #define PRIx64 "llx"
+#else
+  #define PRIx64 "X"
 #endif
 
 #define __STDC_FORMAT_MACROS
