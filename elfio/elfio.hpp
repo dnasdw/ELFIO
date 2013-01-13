@@ -229,7 +229,6 @@ class elfio
 //------------------------------------------------------------------------------
     void clean()
     {
-        // TODO: Instead of deletion, substitute to NULL object
         delete header;
         header = 0;
 
@@ -269,7 +268,7 @@ class elfio
 //------------------------------------------------------------------------------
     section* create_section()
     {
-        section* new_section;
+        section*      new_section;
         unsigned char file_class = get_class();
 
         if ( file_class == ELFCLASS64 ) {
@@ -292,7 +291,7 @@ class elfio
 //------------------------------------------------------------------------------
     segment* create_segment()
     {
-        segment* new_segment;
+        segment*      new_segment;
         unsigned char file_class = header->get_class();
 
         if ( file_class == ELFCLASS64 ) {
