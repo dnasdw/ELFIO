@@ -45,7 +45,6 @@ THE SOFTWARE.
 #include <elfio/elfio_segment.hpp>
 #include <elfio/elfio_strings.hpp>
 
-
 #define ELFIO_HEADER_ACCESS_GET( TYPE, FNAME ) \
 TYPE                                           \
 get_##FNAME() const                            \
@@ -391,10 +390,15 @@ class elfio
     {
         // Fill not completed fields in the header
         header->set_segments_num( segments.size() );
-        header->set_segments_offset( header->get_header_size() );
+        if ( segments.size() == 0 ) {
+            header->set_segments_offset( 0 );
+        }
+        else {
+            header->set_segments_offset( header->get_header_size() );
+        }
         header->set_sections_num( sections.size() );
         header->set_sections_offset( header->get_header_size() +
-        header->get_segment_entry_size() * segments.size() );
+            header->get_segment_entry_size() * segments.size() );
     }
 
 //------------------------------------------------------------------------------
@@ -607,9 +611,10 @@ class elfio
 
 } // namespace ELFIO
 
-#include "elfio_symbols.hpp"
-#include "elfio_note.hpp"
-#include "elfio_relocation.hpp"
+#include <elfio/elfio_symbols.hpp>
+#include <elfio/elfio_note.hpp>
+#include <elfio/elfio_relocation.hpp>
+#include <elfio/elfio_dynamic.hpp>
 
 #ifdef _MSC_VER
 #pragma warning ( pop )
