@@ -687,6 +687,15 @@ class elfio
 
             return new_section;
         }
+        
+        std::vector<section*>::iterator begin() {
+            return parent->sections_.begin();
+        }
+
+        std::vector<section*>::iterator end() {
+            return parent->sections_.end();
+        }
+
 
 //------------------------------------------------------------------------------
       private:
@@ -721,6 +730,14 @@ class elfio
         segment* add()
         {
             return parent->create_segment();
+        }
+
+        std::vector<segment*>::iterator begin() {
+            return parent->segments_.begin();
+        }
+
+        std::vector<segment*>::iterator end() {
+            return parent->segments_.end();
         }
 
 //------------------------------------------------------------------------------
