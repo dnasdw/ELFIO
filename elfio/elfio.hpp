@@ -143,9 +143,8 @@ class elfio
         }
 
         load_sections( stream );
-        load_segments( stream );
-
-        return true;
+        bool is_still_good = load_segments( stream );
+        return is_still_good;
     }
 
 //------------------------------------------------------------------------------
