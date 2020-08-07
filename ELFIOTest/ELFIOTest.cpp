@@ -2,10 +2,6 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#define BOOST_TEST_DYN_LINK
-#endif
 #define BOOST_TEST_MODULE ELFIO_Test
 #include <boost/test/included/unit_test.hpp>
 
