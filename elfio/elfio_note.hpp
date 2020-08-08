@@ -164,7 +164,7 @@ class note_section_accessor_template
     std::vector<Elf_Xword> note_start_positions;
 };
 
-typedef note_section_accessor_template<section> note_section_accessor;
+typedef note_section_accessor_template<section>       note_section_accessor;
 typedef note_section_accessor_template<const section> const_note_section_accessor;
 
 } // namespace ELFIO
