@@ -598,7 +598,7 @@ struct counter_symbol_callback : symbol_section_accessor::symbol_callback
     {
     }
 
-    void operator()(Elf_Xword first, Elf_Xword second)
+    void operator()(Elf_Xword first, Elf_Xword)
     {
         BOOST_CHECK_EQUAL(first, ++counter);
         // std::string name              = "";
@@ -737,10 +737,10 @@ struct relocation_symbol_callback : symbol_section_accessor::symbol_callback
         for (Elf_Word i = 0; i < rela.get_entries_num(); i++) {
             rela.get_entry(i, offset, symbol, rtype, addend);
             if (symbol == first) {
-                rela.set_entry(i, offset, second, rtype, addend);
+                rela.set_entry(i, offset, (Elf_Word)second, rtype, addend);
             }
             if (symbol == second) {
-                rela.set_entry(i, offset, first, rtype, addend);
+                rela.set_entry(i, offset, (Elf_Word)first, rtype, addend);
             }
         }
     }
