@@ -730,19 +730,6 @@ struct relocation_symbol_callback : symbol_section_accessor::symbol_callback
 
     void operator()(Elf_Xword first, Elf_Xword second)
     {
-        // Elf64_Addr offset;
-        // Elf_Word   symbol;
-        // Elf_Word   rtype;
-        // Elf_Sxword addend;
-        // for (Elf_Word i = 0; i < rela.get_entries_num(); i++) {
-        //     rela.get_entry(i, offset, symbol, rtype, addend);
-        //     if (symbol == first) {
-        //         rela.set_entry(i, offset, (Elf_Word)second, rtype, addend);
-        //     }
-        //     if (symbol == second) {
-        //         rela.set_entry(i, offset, (Elf_Word)first, rtype, addend);
-        //     }
-        // }
         rela.swap_symbols(first, second);
     }
 };
