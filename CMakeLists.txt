@@ -9,6 +9,7 @@ if(MSVC)
     endif()
 endif()
 
+add_subdirectory(examples/add_section)
 add_subdirectory(examples/anonymizer)
 add_subdirectory(examples/elfdump)
 add_subdirectory(examples/tutorial)
