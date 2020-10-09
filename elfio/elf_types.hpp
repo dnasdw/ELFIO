@@ -25,7 +25,9 @@ THE SOFTWARE.
 
 #include <elfio/compat.hpp>
 
+#ifdef __cplusplus
 namespace ELFIO {
+#endif
 
 // Attention! Platform depended definitions.
 typedef uint16_t Elf_Half;
@@ -844,6 +846,8 @@ struct Elf64_Dyn
     } d_un;
 };
 
+#ifdef __cplusplus
 } // namespace ELFIO
+#endif
 
 #endif // ELFTYPES_H
