@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
             }
         }
     }
-
+/*
     {
         int segno = elfio_get_segments_num( pelfio );
         printf( "\nSegments No   : %d\n", segno );
@@ -50,6 +50,9 @@ int main( int argc, char* argv[] )
             }
         }
     }
+*/
+
+
 
     elfio_delete( pelfio );
 
