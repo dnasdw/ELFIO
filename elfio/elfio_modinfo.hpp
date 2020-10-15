@@ -56,7 +56,7 @@ template <class S> class modinfo_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
-    bool get_attribute( std::string field_name, std::string& value ) const
+    bool get_attribute( const std::string field_name, std::string& value ) const
     {
         for ( std::vector<std::pair<std::string, std::string>>::const_iterator
                   i = content.begin();
@@ -71,7 +71,7 @@ template <class S> class modinfo_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
-    Elf_Word add_attribute( std::string field, std::string value )
+    Elf_Word add_attribute( const std::string field, const std::string value )
     {
         Elf_Word current_position = 0;
 
