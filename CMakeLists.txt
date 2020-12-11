@@ -26,9 +26,6 @@ configure_file(${version_header} ${CMAKE_CURRENT_BINARY_DIR}/elfio_version.hpp.c
 
 project(elfio VERSION ${version} LANGUAGES C CXX)
 
-# Enable C++11
-set(CMAKE_CXX_STANDARD 11)
-
 if(MSVC)
     if(MSVC_VERSION LESS 1600)
         add_definitions(-DELFIO_NO_CSTDINT)
@@ -46,6 +43,11 @@ target_include_directories(
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+# Enable C++11 for examples and tests
+if (ELFIO_BUILD_EXAMPLES OR ELFIO_BUILD_TESTS)
+    set(CMAKE_CXX_STANDARD 11)
+endif()
 
 if (ELFIO_BUILD_EXAMPLES)
     add_subdirectory(examples)
