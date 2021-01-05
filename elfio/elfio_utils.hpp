@@ -189,6 +189,21 @@ inline std::string to_dec_string( uint64_t value )
     return str;
 }
 
+inline std::string to_hex_string( Elf64_Addr t )
+{
+    std::string s;
+    while( t ) {
+        auto d = t & 0xf;
+        if ( d < 0xa )
+            s = char('0' + d) + s;
+        else
+            s = char('A' + d - 0xa) + s;
+        t >>= 4;
+    }
+    return "0x" + s;
+}
+
+
 } // namespace ELFIO
 
 #endif // ELFIO_UTILS_HPP
