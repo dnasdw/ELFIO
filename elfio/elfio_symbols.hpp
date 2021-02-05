@@ -48,9 +48,9 @@ template <class S> class symbol_section_accessor_template
     };
 
     //------------------------------------------------------------------------------
-    symbol_section_accessor_template( const elfio& elf_file_,
-                                      S*           symbol_section_ )
-        : elf_file( elf_file_ ), symbol_section( symbol_section_ )
+    symbol_section_accessor_template( const elfio& elf_file,
+                                      S*           symbol_section )
+        : elf_file( elf_file ), symbol_section( symbol_section )
     {
         find_hash_section();
     }
