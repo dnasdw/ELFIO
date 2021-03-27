@@ -23,9 +23,11 @@ THE SOFTWARE.
 #ifndef ELFIO_UTILS_HPP
 #define ELFIO_UTILS_HPP
 
+#include <iostream>
+
 #define ELFIO_GET_ACCESS( TYPE, NAME, FIELD ) \
     TYPE get_##NAME() const { return ( *convertor )( FIELD ); }
-    
+
 #define ELFIO_SET_ACCESS( TYPE, NAME, FIELD ) \
     void set_##NAME( TYPE value )             \
     {                                         \
@@ -192,17 +194,26 @@ inline std::string to_dec_string( uint64_t value )
 inline std::string to_hex_string( Elf64_Addr t )
 {
     std::string s;
-    while( t ) {
+    while ( t ) {
         int d = t & 0xf;
         if ( d < 0xa )
-            s = char('0' + d) + s;
+            s = char( '0' + d ) + s;
         else
-            s = char('A' + d - 0xa) + s;
+            s = char( 'A' + d - 0xA ) + s;
         t >>= 4;
     }
     return "0x" + s;
 }
 
+inline void adjust_stream_size( std::ostream& stream, std::streamsize offset )
+{
+    stream.seekp( 0, stream.end );
+    if ( stream.tellp() < offset ) {
+        std::streamsize size = offset - stream.tellp();
+        stream.write( std::string( size, '\0' ).c_str(), size );
+    }
+    stream.seekp( offset );
+}
 
 } // namespace ELFIO
 
