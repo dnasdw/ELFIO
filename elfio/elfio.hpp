@@ -78,6 +78,7 @@ class elfio
     }
 
     //------------------------------------------------------------------------------
+    // clang-format off
 #if defined( _MSC_VER ) && _MSC_VER < 1800
   private:
     elfio( const elfio& );
@@ -85,9 +86,12 @@ class elfio
 
   public:
 #else
-    elfio( const elfio& ) = delete;
+    elfio( const elfio& )            = delete;
     elfio& operator=( const elfio& ) = delete;
 #endif
+    elfio( elfio&& )                 = default;
+    elfio& operator=( elfio&& )      = default;
+    // clang-format on
 
     //------------------------------------------------------------------------------
     ~elfio() { clean(); }
