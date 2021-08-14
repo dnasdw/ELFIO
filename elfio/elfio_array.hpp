@@ -77,11 +77,11 @@ template <class S, typename T> class array_section_accessor_template
     S*           array_section;
 };
 
-template <typename T>
+template <typename T = Elf32_Word>
 struct array_section_accessor {
     typedef array_section_accessor_template<section, T> type;
 };
-template <typename T>
+template <typename T = Elf32_Word>
 struct const_array_section_accessor {
     typedef array_section_accessor_template<const section, T> type;
 };
