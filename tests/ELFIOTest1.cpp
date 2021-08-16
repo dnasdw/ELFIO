@@ -878,7 +878,7 @@ BOOST_AUTO_TEST_CASE( rearrange_local_symbols_with_reallocation )
         rela.get_entry( i, offset, symbol, rtype, addend );
         symbols.get_symbol( symbol, name, value, size, bind, type,
                             section_index, other );
-        before.push_back( name );
+        before.emplace_back( name );
     }
 
     symbols.arrange_local_symbols( relocation_symbol_callback( rela ) );
@@ -910,7 +910,7 @@ BOOST_AUTO_TEST_CASE( rearrange_local_symbols_with_reallocation )
         rel.get_entry( i, offset, symbol, rtype, addend );
         syms.get_symbol( symbol, name, value, size, bind, type, section_index,
                          other );
-        after.push_back( name );
+        after.emplace_back( name );
     }
 
     BOOST_CHECK_EQUAL_COLLECTIONS( before.begin(), before.end(), after.begin(),
