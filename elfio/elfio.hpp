@@ -72,7 +72,7 @@ class elfio
     //------------------------------------------------------------------------------
     elfio() : sections( this ), segments( this )
     {
-        header           = 0;
+        header           = nullptr;
         current_file_pos = 0;
         create( ELFCLASS32, ELFDATA2LSB );
     }
@@ -147,7 +147,7 @@ class elfio
 
         convertor.setup( e_ident[EI_DATA] );
         header = create_header( e_ident[EI_CLASS], e_ident[EI_DATA] );
-        if ( 0 == header ) {
+        if ( nullptr == header ) {
             return false;
         }
         if ( !header->load( stream ) ) {
@@ -350,14 +350,14 @@ class elfio
                  is_offset_in_section( offset, sec ) )
                 return sec;
         }
-        return NULL;
+        return nullptr;
     }
 
     //------------------------------------------------------------------------------
     void clean()
     {
         delete header;
-        header = 0;
+        header = nullptr;
 
         for ( std::vector<section*>::iterator it = sections_.begin();
               it != sections_.end(); ++it ) {
@@ -376,7 +376,7 @@ class elfio
     elf_header* create_header( unsigned char file_class,
                                unsigned char encoding )
     {
-        elf_header* new_header = 0;
+        elf_header* new_header = nullptr;
 
         if ( file_class == ELFCLASS64 ) {
             new_header =
@@ -387,7 +387,7 @@ class elfio
                 new elf_header_impl<Elf32_Ehdr>( &convertor, encoding );
         }
         else {
-            return 0;
+            return nullptr;
         }
 
         return new_header;
@@ -406,7 +406,7 @@ class elfio
             new_section = new section_impl<Elf32_Shdr>( &convertor );
         }
         else {
-            return 0;
+            return nullptr;
         }
 
         new_section->set_index( (Elf_Half)sections_.size() );
@@ -428,7 +428,7 @@ class elfio
             new_segment = new segment_impl<Elf32_Phdr>( &convertor );
         }
         else {
-            return 0;
+            return nullptr;
         }
 
         new_segment->set_index( (Elf_Half)segments_.size() );
@@ -477,7 +477,7 @@ class elfio
             for ( Elf_Half i = 0; i < num; ++i ) {
                 Elf_Word section_offset = sections[i]->get_name_string_offset();
                 const char* p = str_reader.get_string( section_offset );
-                if ( p != 0 ) {
+                if ( p != nullptr ) {
                     sections[i]->set_name( p );
                 }
             }
@@ -877,7 +877,7 @@ class elfio
         //------------------------------------------------------------------------------
         section* operator[]( unsigned int index ) const
         {
-            section* sec = 0;
+            section* sec = nullptr;
 
             if ( index < parent->sections_.size() ) {
                 sec = parent->sections_[index];
@@ -889,7 +889,7 @@ class elfio
         //------------------------------------------------------------------------------
         section* operator[]( const std::string& name ) const
         {
-            section* sec = 0;
+            section* sec = nullptr;
 
             for ( std::vector<section*>::iterator it =
                       parent->sections_.begin();
