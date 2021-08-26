@@ -718,12 +718,12 @@ class elfio
         // sub sequence of other segments are located at the end
         worklist = get_ordered_segments();
 
-        for ( size_t i = 0; i < worklist.size(); ++i ) {
+        for ( std::vector<segment*>::iterator it = worklist.begin();
+              it != worklist.end(); ++it ) {
+            segment*  seg              = *it;
             Elf_Xword segment_memory   = 0;
             Elf_Xword segment_filesize = 0;
             Elf_Xword seg_start_pos    = current_file_pos;
-            segment*  seg              = worklist[i];
-
             // Special case: PHDR segment
             // This segment contains the program headers but no sections
             if ( seg->get_type() == PT_PHDR && seg->get_sections_num() == 0 ) {
