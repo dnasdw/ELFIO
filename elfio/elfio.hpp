@@ -192,7 +192,7 @@ class elfio
 
         unsigned char e_ident[EI_NIDENT];
         // Read ELF file signature
-        stream.seekg( addr_translator( 0 ) );
+        stream.seekg( addr_translator[0] );
         stream.read( reinterpret_cast<char*>( &e_ident ), sizeof( e_ident ) );
 
         // Is it ELF file?
