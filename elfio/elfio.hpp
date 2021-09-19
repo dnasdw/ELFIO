@@ -70,11 +70,42 @@ class elfio
 {
   public:
     //------------------------------------------------------------------------------
-    elfio() : sections( this ), segments( this )
+    elfio() noexcept : sections( this ), segments( this )
     {
         header           = nullptr;
         current_file_pos = 0;
         create( ELFCLASS32, ELFDATA2LSB );
+    }
+
+    elfio( elfio&& other ) noexcept : sections( this ), segments( this )
+    {
+        header           = std::move(other.header);
+        sections_        = std::move(other.sections_);
+        segments_        = std::move(other.segments_);
+        convertor        = std::move(other.convertor);
+        current_file_pos = std::move(other.current_file_pos);
+
+        other.header = nullptr;
+        other.sections_.clear();
+        other.segments_.clear();
+    }
+
+    elfio& operator=( elfio&& other ) noexcept
+    {
+        if ( this != &other ) {
+            clean();
+
+            header           = std::move(other.header);
+            sections_        = std::move(other.sections_);
+            segments_        = std::move(other.segments_);
+            convertor        = std::move(other.convertor);
+            current_file_pos = std::move(other.current_file_pos);
+
+            other.header = nullptr;
+            other.sections_.clear();
+            other.segments_.clear();
+        }
+        return *this;
     }
 
     //------------------------------------------------------------------------------
@@ -88,10 +119,6 @@ class elfio
 #else
     elfio( const elfio& )            = delete;
     elfio& operator=( const elfio& ) = delete;
-#endif
-#if !( defined( _MSC_VER ) && _MSC_VER < 1900 )
-    elfio( elfio&& )                 = default;
-    elfio& operator=( elfio&& )      = default;
 #endif
     // clang-format on
 
@@ -805,7 +832,7 @@ class elfio
                         align = 1;
                     }
                     Elf64_Off error = current_file_pos % align;
-                    section_align        = ( align - error ) % align;
+                    section_align   = ( align - error ) % align;
                 }
                 else if ( section_generated[index] ) {
                     // Alignment for already generated sections
