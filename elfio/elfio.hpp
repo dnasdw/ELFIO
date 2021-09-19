@@ -110,11 +110,11 @@ class elfio
 #else
     elfio( elfio&& other ) noexcept : sections( this ), segments( this )
     {
-        header           = std::move(other.header);
-        sections_        = std::move(other.sections_);
-        segments_        = std::move(other.segments_);
-        convertor        = std::move(other.convertor);
-        current_file_pos = std::move(other.current_file_pos);
+        header           = std::move( other.header );
+        sections_        = std::move( other.sections_ );
+        segments_        = std::move( other.segments_ );
+        convertor        = std::move( other.convertor );
+        current_file_pos = std::move( other.current_file_pos );
 
         other.header = nullptr;
         other.sections_.clear();
@@ -126,11 +126,11 @@ class elfio
         if ( this != &other ) {
             clean();
 
-            header           = std::move(other.header);
-            sections_        = std::move(other.sections_);
-            segments_        = std::move(other.segments_);
-            convertor        = std::move(other.convertor);
-            current_file_pos = std::move(other.current_file_pos);
+            header           = std::move( other.header );
+            sections_        = std::move( other.sections_ );
+            segments_        = std::move( other.segments_ );
+            convertor        = std::move( other.convertor );
+            current_file_pos = std::move( other.current_file_pos );
 
             other.header = nullptr;
             other.sections_.clear();
@@ -493,10 +493,12 @@ class elfio
         unsigned char file_class  = header->get_class();
 
         if ( file_class == ELFCLASS64 ) {
-            new_segment = new segment_impl<Elf64_Phdr>( &convertor );
+            new_segment =
+                new segment_impl<Elf64_Phdr>( &convertor, &addr_translator );
         }
         else if ( file_class == ELFCLASS32 ) {
-            new_segment = new segment_impl<Elf32_Phdr>( &convertor );
+            new_segment =
+                new segment_impl<Elf32_Phdr>( &convertor, &addr_translator );
         }
         else {
             return nullptr;
@@ -587,10 +589,12 @@ class elfio
             unsigned char file_class = header->get_class();
 
             if ( file_class == ELFCLASS64 ) {
-                seg = new segment_impl<Elf64_Phdr>( &convertor );
+                seg = new segment_impl<Elf64_Phdr>( &convertor,
+                                                    &addr_translator );
             }
             else if ( file_class == ELFCLASS32 ) {
-                seg = new segment_impl<Elf32_Phdr>( &convertor );
+                seg = new segment_impl<Elf32_Phdr>( &convertor,
+                                                    &addr_translator );
             }
             else {
                 return false;
