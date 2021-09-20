@@ -114,6 +114,7 @@ class elfio
         sections_        = std::move( other.sections_ );
         segments_        = std::move( other.segments_ );
         convertor        = std::move( other.convertor );
+        addr_translator  = std::move( other.addr_translator );
         current_file_pos = std::move( other.current_file_pos );
 
         other.header = nullptr;
@@ -130,6 +131,7 @@ class elfio
             sections_        = std::move( other.sections_ );
             segments_        = std::move( other.segments_ );
             convertor        = std::move( other.convertor );
+            addr_translator  = std::move( other.addr_translator );
             current_file_pos = std::move( other.current_file_pos );
 
             other.header = nullptr;
@@ -439,6 +441,9 @@ class elfio
             delete *it;
         }
         segments_.clear();
+
+        std::vector<address_translation> empty_address_translation;
+        addr_translator.set_address_translation( empty_address_translation );
     }
 
     //------------------------------------------------------------------------------

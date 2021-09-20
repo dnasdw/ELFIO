@@ -163,10 +163,10 @@ class endianess_convertor
 //------------------------------------------------------------------------------
 struct address_translation
 {
-    address_translation( uint64_t start, uint64_t end, uint64_t map_to )
-        : start( start ), end( end ), map_to( map_to ){};
+    address_translation( uint64_t start, uint64_t size, uint64_t map_to )
+        : start( start ), size( size ), map_to( map_to ){};
     std::streampos start;
-    std::streampos end;
+    std::streampos size;
     std::streampos map_to;
 };
 
@@ -177,22 +177,24 @@ class address_translator
     //------------------------------------------------------------------------------
     void set_address_translation( std::vector<address_translation>& addr_trans )
     {
-        translation = addr_trans;
+        addr_translations = addr_trans;
+
+        std::sort( addr_translations.begin(), addr_translations.end(),
+                   address_translation_map_to_less() );
     }
 
     //------------------------------------------------------------------------------
     std::streampos operator[]( std::streampos value ) const
     {
-        if ( translation.empty() ) {
+        if ( addr_translations.empty() ) {
             return value;
         }
 
         for ( std::vector<address_translation>::const_iterator it =
-                  translation.begin();
-              it != translation.end(); ++it ) {
+                  addr_translations.begin();
+              it != addr_translations.end(); ++it ) {
             const address_translation& t = *it;
-            if ( t.map_to <= value &&
-                 ( ( value - t.map_to ) < ( t.end - t.start ) ) ) {
+            if ( ( t.map_to <= value ) && ( ( value - t.map_to ) < t.size ) ) {
                 return t.start - t.map_to + value;
             }
         }
@@ -200,10 +202,19 @@ class address_translator
         return value;
     }
 
-    bool empty() const { return translation.empty(); }
+    bool empty() const { return addr_translations.empty(); }
 
   private:
-    std::vector<address_translation> translation;
+    struct address_translation_map_to_less
+    {
+        bool operator()( const address_translation& a,
+                         const address_translation& b ) const
+        {
+            return a.map_to < b.map_to;
+        }
+    };
+
+    std::vector<address_translation> addr_translations;
 };
 
 //------------------------------------------------------------------------------
