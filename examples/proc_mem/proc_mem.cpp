@@ -49,10 +49,10 @@ void get_translation_ranges( std::ifstream&                    proc_maps,
             if ( match.size() == 9 && match[8].str() == file_name ) {
                 uint64_t start = std::strtoull( match[1].str().c_str(), 0, 16 );
                 uint64_t end   = std::strtoull( match[2].str().c_str(), 0, 16 );
-                uint64_t mapped =
+                uint64_t actual =
                     std::strtoull( match[4].str().c_str(), 0, 16 );
                 result.emplace_back(
-                    address_translation( start, end - start, mapped ) );
+                    address_translation( actual, end - start, start ) );
             }
         }
     }
