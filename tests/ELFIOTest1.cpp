@@ -614,30 +614,16 @@ BOOST_AUTO_TEST_CASE( invalid_file )
 ////////////////////////////////////////////////////////////////////////////////
 struct counter_symbol_callback : symbol_section_accessor::symbol_callback
 {
-    symbol_section_accessor& symbols;
     int counter;
 
-    explicit counter_symbol_callback( symbol_section_accessor& symbols )
-        : symbols( symbols ), counter( 0 )
+    explicit counter_symbol_callback()
+        : counter( 0 )
     {
     }
 
     void operator()( Elf_Xword first, Elf_Xword )
     {
         BOOST_CHECK_EQUAL( first, ++counter );
-        // std::string name              = "";
-        // ELFIO::Elf64_Addr value       = 0;
-        // ELFIO::Elf_Xword size         = 0;
-        // unsigned char bind            = STB_LOCAL;
-        // unsigned char type            = STT_FUNC;
-        // ELFIO::Elf_Half section_index = 0;
-        // unsigned char other           = 0;
-
-        // std::cout << first << " " << second << std::endl;
-        // symbols.get_symbol(first, name, value, size, bind, type, section_index, other);
-        // std::cout << "  " << name;
-        // symbols.get_symbol(second, name, value, size, bind, type, section_index, other);
-        // std::cout << "  " << name << std::endl;
     }
 };
 
@@ -712,7 +698,7 @@ BOOST_AUTO_TEST_CASE( rearrange_local_symbols )
     symbols.add_symbol( str_writer, name.c_str(), value, size, bind, type,
                         other, section_index );
 
-    counter_symbol_callback counter_callback( symbols );
+    counter_symbol_callback counter_callback;
     symbols.arrange_local_symbols( counter_callback );
 
     BOOST_REQUIRE_EQUAL( writer.save( file_name ), true );
