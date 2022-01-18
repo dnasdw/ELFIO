@@ -625,19 +625,6 @@ struct counter_symbol_callback : symbol_section_accessor::symbol_callback
     void operator()( Elf_Xword first, Elf_Xword )
     {
         BOOST_CHECK_EQUAL( first, ++counter );
-        // std::string name              = "";
-        // ELFIO::Elf64_Addr value       = 0;
-        // ELFIO::Elf_Xword size         = 0;
-        // unsigned char bind            = STB_LOCAL;
-        // unsigned char type            = STT_FUNC;
-        // ELFIO::Elf_Half section_index = 0;
-        // unsigned char other           = 0;
-
-        // std::cout << first << " " << second << std::endl;
-        // symbols.get_symbol(first, name, value, size, bind, type, section_index, other);
-        // std::cout << "  " << name;
-        // symbols.get_symbol(second, name, value, size, bind, type, section_index, other);
-        // std::cout << "  " << name << std::endl;
     }
 };
 
