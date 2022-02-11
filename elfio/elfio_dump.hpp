@@ -51,33 +51,6 @@ static const struct endian_table_t
     { ELFDATA2MSB, "Big endian" },
 };
 
-static const struct os_abi_table_t
-{
-    const unsigned char key;
-    const char*         str;
-} os_abi_table[] = {
-    { ELFOSABI_NONE, "UNIX System V" },
-    { ELFOSABI_HPUX, "Hewlett-Packard HP-UX" },
-    { ELFOSABI_NETBSD, "NetBSD" },
-    { ELFOSABI_LINUX, "Linux" },
-    { ELFOSABI_HURD, "GNU Hurd" },
-    { ELFOSABI_SOLARIS, "Sun Solaris" },
-    { ELFOSABI_AIX, "AIX" },
-    { ELFOSABI_IRIX, "IRIX" },
-    { ELFOSABI_FREEBSD, "FreeBSD" },
-    { ELFOSABI_TRU64, "Compaq TRU64 UNIX" },
-    { ELFOSABI_MODESTO, "Novell Modesto" },
-    { ELFOSABI_OPENBSD, "Open BSD" },
-    { ELFOSABI_OPENVMS, "Open VMS" },
-    { ELFOSABI_NSK, "Hewlett-Packard Non-Stop Kernel" },
-    { ELFOSABI_AROS, "Amiga Research OS" },
-    { ELFOSABI_FENIXOS, "FenixOS" },
-    { ELFOSABI_NUXI, "Nuxi CloudABI" },
-    { ELFOSABI_OPENVOS, "OpenVOS" },
-    { ELFOSABI_ARM, "ARM" },
-    { ELFOSABI_STANDALONE, "Standalone (embedded)" },
-};
-
 static const struct version_table_t
 {
     const Elf64_Word key;
@@ -396,11 +369,6 @@ static const struct section_type_table_t
     { SHT_GNU_verdef, "GNU_verdef" },
     { SHT_GNU_verneed, "GNU_verneed" },
     { SHT_GNU_versym, "GNU_versym" },
-    { SHT_ARM_EXIDX, "ARM_EXIDX" },
-    { SHT_ARM_PREEMPTMAP, "ARM_PREEMPTMAP" },
-    { SHT_ARM_ATTRIBUTES, "ARM_ATTRIBUTES" },
-    { SHT_ARM_DEBUGOVERLAY, "ARM_DEBUGOVERLAY" },
-    { SHT_ARM_OVERLAYSECTION, "ARM_OVERLAYSECTION" },
 
 };
 
@@ -427,7 +395,6 @@ static const struct segment_type_table_t
     { PT_OPENBSD_RANDOMIZE, "OPENBSD_RANDOMIZE" },
     { PT_OPENBSD_WXNEEDED, "OPENBSD_WXNEEDED " },
     { PT_OPENBSD_BOOTDATA, "OPENBSD_BOOTDATA " },
-    { PT_SUNWBSS, "PT_SUNWBSS" },
     { PT_SUNWSTACK, "SUNWSTACK" },
 };
 
@@ -505,23 +472,8 @@ static const struct dynamic_tag_t
     { DT_PREINIT_ARRAYSZ, "PREINIT_ARRAYSZ" },
     { DT_MAXPOSTAGS, "MAXPOSTAGS" },
     { DT_GNU_HASH, "GNU_HASH" },
-    { DT_TLSDESC_PLT, "TLSDESC_PLT" },
-    { DT_TLSDESC_GOT, "TLSDESC_GOT" },
-    { DT_GNU_CONFLICT, "GNU_CONFLICT" },
-    { DT_GNU_LIBLIST, "GNU_LIBLIST" },
-    { DT_CONFIG, "CONFIG" },
-    { DT_DEPAUDIT, "DEPAUDIT" },
-    { DT_AUDIT, "AUDIT" },
-    { DT_PLTPAD, "PLTPAD" },
-    { DT_MOVETAB, "MOVETAB" },
-    { DT_SYMINFO, "SYMINFO" },
-    { DT_ADDRRNGHI, "ADDRRNGHI" },
     { DT_VERSYM, "VERSYM" },
-    { DT_RELACOUNT, "RELACOUNT" },
-    { DT_RELCOUNT, "RELCOUNT" },
     { DT_FLAGS_1, "FLAGS_1" },
-    { DT_VERDEF, "VERDEF" },
-    { DT_VERDEFNUM, "VERDEFNUM" },
     { DT_VERNEED, "VERNEED" },
     { DT_VERNEEDNUM, "VERNEEDNUM" },
 };
@@ -669,6 +621,9 @@ static const struct note_tag_t
 };
 // clang-format on
 
+#define NT_LARCH_LBT 0xa04 /* LoongArch Binary Translation registers */
+                           /*   note name must be "CORE".  */
+
 static const ELFIO::Elf_Xword MAX_DATA_ENTRIES = 64;
 
 //------------------------------------------------------------------------------
@@ -697,9 +652,6 @@ class dump
             << std::endl
             << "  ELFVersion: " << str_version( reader.get_elf_version() )
             << std::endl
-            << "  OS/ABI:     " << str_os_abi( reader.get_os_abi() )
-            << std::endl
-            << "  ABI Version:" << (int)reader.get_abi_version() << std::endl
             << "  Type:       " << str_type( reader.get_type() ) << std::endl
             << "  Machine:    " << str_machine( reader.get_machine() )
             << std::endl
@@ -735,15 +687,11 @@ class dump
         }
 
         for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
-            const section* sec = reader.sections[i];
+            section* sec = reader.sections[i];
             section_header( out, i, sec, reader.get_class() );
         }
 
-        out << "Key to Flags: W (write), A (alloc), X (execute), " << std::endl;
-        out << "              M (merge), S (strings), I (info)," << std::endl;
-        out << "              L (link order), O (extra OS processing required),"
-            << std::endl;
-        out << "              G (group), T (TLS), C (compressed), E (exclude)"
+        out << "Key to Flags: W (write), A (alloc), X (execute)\n\n"
             << std::endl;
     }
 
@@ -816,7 +764,7 @@ class dump
         }
 
         for ( Elf_Half i = 0; i < n; ++i ) {
-            const segment* seg = reader.segments[i];
+            segment* seg = reader.segments[i];
             segment_header( out, i, seg, reader.get_class() );
         }
 
@@ -864,57 +812,59 @@ class dump
     //------------------------------------------------------------------------------
     static void symbol_tables( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
+        Elf_Half n = reader.sections.size();
+        for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
+            section* sec = reader.sections[i];
             if ( SHT_SYMTAB == sec->get_type() ||
                  SHT_DYNSYM == sec->get_type() ) {
-                const_symbol_section_accessor symbols( reader, sec.get() );
+                symbol_section_accessor symbols( reader, sec );
 
                 Elf_Xword sym_no = symbols.get_symbols_num();
-                if ( sym_no == 0 ) {
-                    continue;
-                }
-
-                out << "Symbol table (" << sec->get_name() << ")" << std::endl;
-                if ( reader.get_class() == ELFCLASS32 ) { // Output for 32-bit
-                    out << "[  Nr ] Value      Size       Type    Bind     "
-                           " Sect Name"
+                if ( sym_no > 0 ) {
+                    out << "Symbol table (" << sec->get_name() << ")"
                         << std::endl;
-                }
-                else { // Output for 64-bit
-                    out << "[  Nr ] Value              Size               "
-                           "Type    Bind      Sect"
-                        << std::endl
-                        << "        Name" << std::endl;
-                }
-                for ( Elf_Xword i = 0; i < sym_no; ++i ) {
-                    std::string   name;
-                    Elf64_Addr    value   = 0;
-                    Elf_Xword     size    = 0;
-                    unsigned char bind    = 0;
-                    unsigned char type    = 0;
-                    Elf_Half      section = 0;
-                    unsigned char other   = 0;
-                    symbols.get_symbol( i, name, value, size, bind, type,
-                                        section, other );
-                    symbol_table( out, i, name, value, size, bind, type,
-                                  section, reader.get_class() );
-                }
+                    if ( reader.get_class() ==
+                         ELFCLASS32 ) { // Output for 32-bit
+                        out << "[  Nr ] Value      Size       Type    Bind     "
+                               " Sect Name"
+                            << std::endl;
+                    }
+                    else { // Output for 64-bit
+                        out << "[  Nr ] Value              Size               "
+                               "Type    Bind      Sect"
+                            << std::endl
+                            << "        Name" << std::endl;
+                    }
+                    for ( Elf_Xword j = 0; j < sym_no; ++j ) {
+                        std::string   name;
+                        Elf64_Addr    value   = 0;
+                        Elf_Xword     size    = 0;
+                        unsigned char bind    = 0;
+                        unsigned char type    = 0;
+                        Elf_Half      section = 0;
+                        unsigned char other   = 0;
+                        symbols.get_symbol( j, name, value, size, bind, type,
+                                            section, other );
+                        symbol_table( out, j, name, value, size, bind, type,
+                                      section, reader.get_class() );
+                    }
 
-                out << std::endl;
+                    out << std::endl;
+                }
             }
         }
     }
 
     //------------------------------------------------------------------------------
-    static void symbol_table( std::ostream&      out,
-                              Elf_Xword          no,
-                              const std::string& name,
-                              Elf64_Addr         value,
-                              Elf_Xword          size,
-                              unsigned char      bind,
-                              unsigned char      type,
-                              Elf_Half           section,
-                              unsigned int       elf_class )
+    static void symbol_table( std::ostream& out,
+                              Elf_Xword     no,
+                              std::string&  name,
+                              Elf64_Addr    value,
+                              Elf_Xword     size,
+                              unsigned char bind,
+                              unsigned char type,
+                              Elf_Half      section,
+                              unsigned int  elf_class )
     {
         std::ios_base::fmtflags original_flags = out.flags();
 
@@ -944,63 +894,62 @@ class dump
     //------------------------------------------------------------------------------
     static void notes( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
-            if ( SHT_NOTE == sec->get_type() ) {    // Look at notes
-                note_section_accessor notes( reader, sec.get() );
+        Elf_Half no = reader.sections.size();
+        for ( Elf_Half i = 0; i < no; ++i ) { // For all sections
+            section* sec = reader.sections[i];
+            if ( SHT_NOTE == sec->get_type() ) { // Look at notes
+                note_section_accessor notes( reader, sec );
                 Elf_Word              no_notes = notes.get_notes_num();
+                if ( no > 0 ) {
+                    out << "Note section (" << sec->get_name() << ")"
+                        << std::endl
+                        << "    No Name         Data size  Description"
+                        << std::endl;
+                    for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
+                        Elf_Word    type;
+                        std::string name;
+                        void*       desc;
+                        Elf_Word    descsz;
 
-                if ( no_notes == 0 )
-                    continue;
-
-                out << "Note section (" << sec->get_name() << ")" << std::endl
-                    << "    No Name         Data size  Description"
-                    << std::endl;
-                for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
-                    Elf_Word    type;
-                    std::string name;
-                    char*       desc;
-                    Elf_Word    descsz;
-
-                    if ( notes.get_note( j, type, name, desc, descsz ) ) {
-                        // 'name' usually contains \0 at the end. Remove it
-                        name = name.c_str();
-                        note( out, j, type, name, desc, descsz );
-                        out << std::endl;
+                        if ( notes.get_note( j, type, name, desc, descsz ) ) {
+                            // 'name' usually contains \0 at the end. Remove it
+                            name = name.c_str();
+                            note( out, j, type, name, desc, descsz );
+                            out << std::endl;
+                        }
                     }
-                }
 
-                out << std::endl;
+                    out << std::endl;
+                }
             }
         }
 
-        Elf_Half no = reader.segments.size();
+        no = reader.segments.size();
         for ( Elf_Half i = 0; i < no; ++i ) { // For all segments
             segment* seg = reader.segments[i];
             if ( PT_NOTE == seg->get_type() ) { // Look at notes
                 note_segment_accessor notes( reader, seg );
                 Elf_Word              no_notes = notes.get_notes_num();
+                if ( no > 0 ) {
+                    out << "Note segment (" << i << ")" << std::endl
+                        << "    No Name         Data size  Description"
+                        << std::endl;
+                    for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
+                        Elf_Word    type;
+                        std::string name;
+                        void*       desc;
+                        Elf_Word    descsz;
 
-                if ( no_notes == 0 )
-                    continue;
-
-                out << "Note segment (" << i << ")" << std::endl
-                    << "    No Name         Data size  Description"
-                    << std::endl;
-                for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
-                    Elf_Word    type;
-                    std::string name;
-                    char*       desc;
-                    Elf_Word    descsz;
-
-                    if ( notes.get_note( j, type, name, desc, descsz ) ) {
-                        // 'name' usually contains \0 at the end. Remove it
-                        name = name.c_str();
-                        note( out, j, type, name, desc, descsz );
-                        out << std::endl;
+                        if ( notes.get_note( j, type, name, desc, descsz ) ) {
+                            // 'name' usually contains \0 at the end. Remove it
+                            name = name.c_str();
+                            note( out, j, type, name, desc, descsz );
+                            out << std::endl;
+                        }
                     }
-                }
 
-                out << std::endl;
+                    out << std::endl;
+                }
             }
         }
     }
@@ -1015,7 +964,7 @@ class dump
     {
         out << "  [" << DUMP_DEC_FORMAT( 2 ) << no << "] ";
 
-        const auto name_group = std::find_if(
+        const note_tag_t* name_group = std::find_if(
             std::begin( note_tag_table ), std::end( note_tag_table ),
             [&name]( const note_tag_t& entry ) { return entry.name == name; } );
 
@@ -1043,7 +992,7 @@ class dump
 
         if ( descsz != 0 ) {
             for ( Elf_Word i = 0; i < descsz; ++i ) {
-                if ( i % 16 == 0 ) {
+                if ( i % 48 == 0 ) {
                     out << std::endl << "         ";
                 }
                 out << DUMP_HEX_FORMAT( 2 )
@@ -1055,15 +1004,17 @@ class dump
     //------------------------------------------------------------------------------
     static void modinfo( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
-            if ( ".modinfo" == sec->get_name() ) {  // Look for the section
+        Elf_Half no = reader.sections.size();
+        for ( Elf_Half i = 0; i < no; ++i ) { // For all sections
+            section* sec = reader.sections[i];
+            if ( ".modinfo" == sec->get_name() ) { // Look for the section
                 out << "Section .modinfo" << std::endl;
 
-                const_modinfo_section_accessor modinfo( sec.get() );
-                for ( Elf_Word i = 0; i < modinfo.get_attribute_num(); i++ ) {
+                const_modinfo_section_accessor modinfo( sec );
+                for ( Elf_Word j = 0; j < modinfo.get_attribute_num(); j++ ) {
                     std::string field;
                     std::string value;
-                    if ( modinfo.get_attribute( i, field, value ) ) {
+                    if ( modinfo.get_attribute( j, field, value ) ) {
                         out << "  " << std::setw( 20 ) << field
                             << std::setw( 0 ) << " = " << value << std::endl;
                     }
@@ -1078,39 +1029,41 @@ class dump
     //------------------------------------------------------------------------------
     static void dynamic_tags( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
+        Elf_Half n = reader.sections.size();
+        for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
+            section* sec = reader.sections[i];
             if ( SHT_DYNAMIC == sec->get_type() ) {
-                dynamic_section_accessor dynamic( reader, sec.get() );
+                dynamic_section_accessor dynamic( reader, sec );
 
                 Elf_Xword dyn_no = dynamic.get_entries_num();
-                if ( dyn_no == 0 )
-                    continue;
-
-                out << "Dynamic section (" << sec->get_name() << ")"
-                    << std::endl;
-                out << "[  Nr ] Tag              Name/Value" << std::endl;
-                for ( Elf_Xword i = 0; i < dyn_no; ++i ) {
-                    Elf_Xword   tag   = 0;
-                    Elf_Xword   value = 0;
-                    std::string str;
-                    dynamic.get_entry( i, tag, value, str );
-                    dynamic_tag( out, i, tag, value, str, reader.get_class() );
-                    if ( DT_NULL == tag ) {
-                        break;
+                if ( dyn_no > 0 ) {
+                    out << "Dynamic section (" << sec->get_name() << ")"
+                        << std::endl;
+                    out << "[  Nr ] Tag              Name/Value" << std::endl;
+                    for ( Elf_Xword j = 0; j < dyn_no; ++j ) {
+                        Elf_Xword   tag   = 0;
+                        Elf_Xword   value = 0;
+                        std::string str;
+                        dynamic.get_entry( j, tag, value, str );
+                        dynamic_tag( out, j, tag, value, str,
+                                     reader.get_class() );
+                        if ( DT_NULL == tag ) {
+                            break;
+                        }
                     }
-                }
 
-                out << std::endl;
+                    out << std::endl;
+                }
             }
         }
     }
 
     //------------------------------------------------------------------------------
-    static void dynamic_tag( std::ostream&      out,
-                             Elf_Xword          no,
-                             Elf_Xword          tag,
-                             Elf_Xword          value,
-                             const std::string& str,
+    static void dynamic_tag( std::ostream& out,
+                             Elf_Xword     no,
+                             Elf_Xword     tag,
+                             Elf_Xword     value,
+                             std::string   str,
                              unsigned int /*elf_class*/ )
     {
         out << "[" << DUMP_DEC_FORMAT( 5 ) << no << "] "
@@ -1168,7 +1121,7 @@ class dump
         out << "Section Data:" << std::endl;
 
         for ( Elf_Half i = 1; i < n; ++i ) { // For all sections
-            const section* sec = reader.sections[i];
+            section* sec = reader.sections[i];
             if ( sec->get_type() == SHT_NOBITS ) {
                 continue;
             }
@@ -1223,7 +1176,7 @@ class dump
         out << "Segment Data:" << std::endl;
 
         for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
-            const segment* seg = reader.segments[i];
+            segment* seg = reader.segments[i];
             segment_data( out, i, seg );
         }
 
@@ -1240,7 +1193,6 @@ class dump
     STR_FUNC_TABLE( class )
     STR_FUNC_TABLE( endian )
     STR_FUNC_TABLE( version )
-    STR_FUNC_TABLE( os_abi )
     STR_FUNC_TABLE( type )
     STR_FUNC_TABLE( machine )
     STR_FUNC_TABLE( section_type )
@@ -1302,36 +1254,6 @@ class dump
         }
         if ( flags & SHF_EXECINSTR ) {
             ret += "X";
-        }
-        if ( flags & SHF_MERGE ) {
-            ret += "M";
-        }
-        if ( flags & SHF_STRINGS ) {
-            ret += "S";
-        }
-        if ( flags & SHF_INFO_LINK ) {
-            ret += "I";
-        }
-        if ( flags & SHF_LINK_ORDER ) {
-            ret += "L";
-        }
-        if ( flags & SHF_OS_NONCONFORMING ) {
-            ret += "O";
-        }
-        if ( flags & SHF_GROUP ) {
-            ret += "G";
-        }
-        if ( flags & SHF_TLS ) {
-            ret += "T";
-        }
-        if ( flags & SHF_COMPRESSED ) {
-            ret += "C";
-        }
-        if ( flags & SHF_EXCLUDE ) {
-            ret += "E";
-        }
-        if ( flags & SHF_GNU_MBIND ) {
-            ret += "D";
         }
 
         return ret;
