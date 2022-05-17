@@ -701,6 +701,7 @@ typedef Elf_Sword Elf64_Sword;
 #define STN_UNDEF 0
 
 // Relocation types
+//   X86
 #define R_386_NONE               0
 #define R_X86_64_NONE            0
 #define R_AMDGPU_NONE            0
