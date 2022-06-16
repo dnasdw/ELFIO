@@ -82,7 +82,7 @@ class section
     ELFIO_SET_ACCESS_DECL( Elf64_Off, offset );
     ELFIO_SET_ACCESS_DECL( Elf_Half, index );
 
-    virtual void load( std::istream& stream, std::streampos header_offset ) = 0;
+    virtual bool load( std::istream& stream, std::streampos header_offset ) = 0;
     virtual void save( std::ostream&  stream,
                        std::streampos header_offset,
                        std::streampos data_offset )                         = 0;
@@ -242,7 +242,7 @@ template <class T> class section_impl : public section
     void set_index( Elf_Half value ) override { index = value; }
 
     //------------------------------------------------------------------------------
-    void load( std::istream& stream, std::streampos header_offset ) override
+    bool load( std::istream& stream, std::streampos header_offset ) override
     {
         std::fill_n( reinterpret_cast<char*>( &header ), sizeof( header ),
                      '\0' );
@@ -267,6 +267,11 @@ template <class T> class section_impl : public section
                 stream.seekg(
                     ( *translator )[( *convertor )( header.sh_offset )] );
                 stream.read( data, size );
+                if (stream.gcount() != size) {
+                    delete[] data;
+                    data = nullptr;
+                    return false;
+                }
                 data[size] = 0; // Ensure data is ended with 0 to avoid oob read
                 data_size  = Elf_Word( size );
             }
@@ -274,6 +279,8 @@ template <class T> class section_impl : public section
                 data_size = 0;
             }
         }
+
+        return true;
     }
 
     //------------------------------------------------------------------------------
