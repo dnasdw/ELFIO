@@ -615,6 +615,8 @@ class elfio
                                          static_cast<std::streampos>( i ) *
                                              entry_size ) ||
                  stream.fail() ) {
+                delete seg;
+                seg = nullptr;
                 return false;
             }
 
