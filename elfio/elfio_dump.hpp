@@ -939,7 +939,7 @@ class dump
                     for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
                         Elf_Word    type;
                         std::string name;
-                        void*       desc;
+                        char*       desc;
                         Elf_Word    descsz;
 
                         if ( notes.get_note( j, type, name, desc, descsz ) ) {
@@ -969,7 +969,7 @@ class dump
                     for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
                         Elf_Word    type;
                         std::string name;
-                        void*       desc;
+                        char*       desc;
                         Elf_Word    descsz;
 
                         if ( notes.get_note( j, type, name, desc, descsz ) ) {
