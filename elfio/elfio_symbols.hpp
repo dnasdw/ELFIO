@@ -586,8 +586,6 @@ template <class S> class symbol_section_accessor_template
             }
         }
 
-        // Elf_Word nRet = symbol_section->get_size() / sizeof(entry) - 1;
-
         return first_not_local;
     }
 

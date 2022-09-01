@@ -75,9 +75,6 @@ class endianess_convertor
 {
   public:
     //------------------------------------------------------------------------------
-    endianess_convertor() { need_conversion = false; }
-
-    //------------------------------------------------------------------------------
     void setup( unsigned char elf_file_encoding )
     {
         need_conversion = ( elf_file_encoding != get_host_encoding() );
@@ -89,14 +86,14 @@ class endianess_convertor
         if ( !need_conversion ) {
             return value;
         }
-        value = ( ( value & 0x00000000000000FFull ) << 56 ) |
-                ( ( value & 0x000000000000FF00ull ) << 40 ) |
-                ( ( value & 0x0000000000FF0000ull ) << 24 ) |
-                ( ( value & 0x00000000FF000000ull ) << 8 ) |
-                ( ( value & 0x000000FF00000000ull ) >> 8 ) |
-                ( ( value & 0x0000FF0000000000ull ) >> 24 ) |
-                ( ( value & 0x00FF000000000000ull ) >> 40 ) |
-                ( ( value & 0xFF00000000000000ull ) >> 56 );
+        value = ( ( value & 0x00000000000000FFuLL ) << 56 ) |
+                ( ( value & 0x000000000000FF00uLL ) << 40 ) |
+                ( ( value & 0x0000000000FF0000uLL ) << 24 ) |
+                ( ( value & 0x00000000FF000000uLL ) << 8 ) |
+                ( ( value & 0x000000FF00000000uLL ) >> 8 ) |
+                ( ( value & 0x0000FF0000000000uLL ) >> 24 ) |
+                ( ( value & 0x00FF000000000000uLL ) >> 40 ) |
+                ( ( value & 0xFF00000000000000uLL ) >> 56 );
 
         return value;
     }
@@ -107,7 +104,7 @@ class endianess_convertor
         if ( !need_conversion ) {
             return value;
         }
-        return (int64_t)(*this)( (uint64_t)value );
+        return (int64_t)( *this )( (uint64_t)value );
     }
 
     //------------------------------------------------------------------------------
@@ -129,7 +126,7 @@ class endianess_convertor
         if ( !need_conversion ) {
             return value;
         }
-        return (int32_t)(*this)( (uint32_t)value );
+        return (int32_t)( *this )( (uint32_t)value );
     }
 
     //------------------------------------------------------------------------------
@@ -138,7 +135,8 @@ class endianess_convertor
         if ( !need_conversion ) {
             return value;
         }
-        value = ( ( value & 0x00FF ) << 8 ) | ( ( value & 0xFF00 ) >> 8 );
+        value =
+            (uint16_t)( ( value & 0x00FF ) << 8 ) | ( ( value & 0xFF00 ) >> 8 );
 
         return value;
     }
@@ -149,7 +147,7 @@ class endianess_convertor
         if ( !need_conversion ) {
             return value;
         }
-        return (int16_t)(*this)( (uint16_t)value );
+        return (int16_t)( *this )( (uint16_t)value );
     }
 
     //------------------------------------------------------------------------------
@@ -173,7 +171,7 @@ class endianess_convertor
     }
 
     //------------------------------------------------------------------------------
-    bool need_conversion;
+    bool need_conversion = false;
 };
 
 //------------------------------------------------------------------------------
