@@ -156,7 +156,7 @@ template <class T> class section_impl : public section
     void set_data( const char* raw_data, Elf_Word size ) override
     {
         if ( get_type() != SHT_NOBITS ) {
-            data = std::unique_ptr<char>( new ( std::nothrow ) char[size] );
+            data = std::unique_ptr<char[]>( new ( std::nothrow ) char[size] );
             if ( nullptr != data.get() && nullptr != raw_data ) {
                 data_size = size;
                 std::copy( raw_data, raw_data + size, data.get() );
@@ -187,7 +187,7 @@ template <class T> class section_impl : public section
             }
             else {
                 data_size = 2 * ( data_size + size );
-                std::unique_ptr<char> new_data(
+                std::unique_ptr<char[]> new_data(
                     new ( std::nothrow ) char[data_size] );
 
                 if ( nullptr != new_data ) {
@@ -314,7 +314,7 @@ template <class T> class section_impl : public section
     T                          header;
     Elf_Half                   index;
     std::string                name;
-    std::unique_ptr<char>      data;
+    std::unique_ptr<char[]>    data;
     Elf_Word                   data_size;
     const endianess_convertor* convertor;
     const address_translator*  translator;
