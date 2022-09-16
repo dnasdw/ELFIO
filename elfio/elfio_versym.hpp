@@ -30,7 +30,8 @@ template <class S> class versym_section_accessor_template
 {
   public:
     //------------------------------------------------------------------------------
-    versym_section_accessor_template( S* section ) : versym_section( section )
+    explicit versym_section_accessor_template( S* section )
+        : versym_section( section )
     {
         if ( section ) {
             entries_num = Elf_Word( section->get_size() / sizeof( Elf_Half ) );
