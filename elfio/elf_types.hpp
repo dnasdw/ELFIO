@@ -358,6 +358,7 @@ typedef Elf_Sword Elf64_Sword;
 #define ELFOSABI_HPUX    1  // Hewlett-Packard HP-UX
 #define ELFOSABI_NETBSD  2  // NetBSD
 #define ELFOSABI_LINUX   3  // Linux
+constexpr unsigned char ELFOSABI_HURD = 4; // GNU Hurd
 #define ELFOSABI_SOLARIS 6  // Sun Solaris
 #define ELFOSABI_AIX     7  // AIX
 #define ELFOSABI_IRIX    8  // IRIX
@@ -369,6 +370,10 @@ typedef Elf_Sword Elf64_Sword;
 #define ELFOSABI_NSK     14 // Hewlett-Packard Non-Stop Kernel
 #define ELFOSABI_AROS    15 // Amiga Research OS
 #define ELFOSABI_FENIXOS 16 // The FenixOS highly scalable multi-core OS
+constexpr unsigned char ELFOSABI_NUXI    = 17; // Nuxi CloudABI
+constexpr unsigned char ELFOSABI_OPENVOS = 18; // Stratus Technologies OpenVOS
+constexpr unsigned char ELFOSABI_ARM     = 97; // ARM
+constexpr unsigned char ELFOSABI_STANDALONE	= 255; // Standalone (embedded) application
 
 // 64-255 Architecture-specific value range
 // AMDGPU OS for HSA compatible compute kernels
@@ -515,6 +520,11 @@ typedef Elf_Sword Elf64_Sword;
 #define SHT_LOOS           0x60000000
 #define SHT_HIOS           0x6fffffff
 #define SHT_LOPROC         0x70000000
+constexpr Elf_Word SHT_ARM_EXIDX           = 0x70000001;
+constexpr Elf_Word SHT_ARM_PREEMPTMAP      = 0x70000002;
+constexpr Elf_Word SHT_ARM_ATTRIBUTES      = 0x70000003;
+constexpr Elf_Word SHT_ARM_DEBUGOVERLAY    = 0x70000004;
+constexpr Elf_Word SHT_ARM_OVERLAYSECTION  = 0x70000005;
 #define SHT_HIPROC         0x7FFFFFFF
 #define SHT_LOUSER         0x80000000
 #define SHT_HIUSER         0xFFFFFFFF
@@ -952,6 +962,7 @@ typedef Elf_Sword Elf64_Sword;
 #define PT_OPENBSD_RANDOMIZE 0X65A3DBE6
 #define PT_OPENBSD_WXNEEDED  0X65A3DBE7
 #define PT_OPENBSD_BOOTDATA  0X65A41BE6
+constexpr Elf_Word PT_SUNWBSS           = 0X6FFFFFFA;
 #define PT_SUNWSTACK         0X6FFFFFFB
 #define PT_HIOS              0X6FFFFFFF
 #define PT_LOPROC            0X70000000
@@ -1000,13 +1011,28 @@ typedef Elf_Sword Elf64_Sword;
 #define DT_PREINIT_ARRAY   32
 #define DT_PREINIT_ARRAYSZ 33
 #define DT_MAXPOSTAGS      34
-#define DT_GNU_HASH        0x6ffffef5
-#define DT_VERSYM          0x6ffffff0
-#define DT_FLAGS_1         0x6ffffffb
-#define DT_VERNEED         0x6ffffffe
-#define DT_VERNEEDNUM      0x6fffffff
 #define DT_LOOS            0x6000000D
 #define DT_HIOS            0x6ffff000
+#define DT_GNU_HASH        0x6ffffef5
+constexpr Elf_Word DT_TLSDESC_PLT     = 0x6ffffef6;
+constexpr Elf_Word DT_TLSDESC_GOT     = 0x6ffffef7;
+constexpr Elf_Word DT_GNU_CONFLICT    = 0x6ffffef8;
+constexpr Elf_Word DT_GNU_LIBLIST     = 0x6ffffef9;
+constexpr Elf_Word DT_CONFIG          = 0x6ffffefa;
+constexpr Elf_Word DT_DEPAUDIT        = 0x6ffffefb;
+constexpr Elf_Word DT_AUDIT           = 0x6ffffefc;
+constexpr Elf_Word DT_PLTPAD          = 0x6ffffefd;
+constexpr Elf_Word DT_MOVETAB         = 0x6ffffefe;
+constexpr Elf_Word DT_SYMINFO         = 0x6ffffeff;
+constexpr Elf_Word DT_ADDRRNGHI       = 0x6ffffeff;
+#define DT_VERSYM          0x6ffffff0
+constexpr Elf_Word DT_RELACOUNT       = 0x6ffffff9;
+constexpr Elf_Word DT_RELCOUNT        = 0x6ffffffa;
+#define DT_FLAGS_1         0x6ffffffb
+constexpr Elf_Word DT_VERDEF          = 0x6ffffffc;
+constexpr Elf_Word DT_VERDEFNUM       = 0x6ffffffd;
+#define DT_VERNEED         0x6ffffffe
+#define DT_VERNEEDNUM      0x6fffffff
 #define DT_LOPROC          0x70000000
 #define DT_HIPROC          0x7FFFFFFF
 
