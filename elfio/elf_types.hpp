@@ -299,26 +299,26 @@ typedef Elf_Sword Elf64_Sword;
 #define EM_IMG1            249 // Imagination Technologies
 #define EM_NFP             250 // Netronome Flow Processor (P)
 #define EM_CSKY            252 // C-SKY processor family
-#define EM_ARC_COMPACT3_64 253 // "Synopsys ARCv2.3 64-bit";
-#define EM_MCS6502         254 // "MOS Technology MCS 6502 processor";
-#define EM_ARC_COMPACT3    255 // "Synopsys ARCv2.3 32-bit";
-#define EM_KVX             256 // "Kalray VLIW core of the MPPA processor family";
-#define EM_65816           257 // "WDC 65816/65C816";
-#define EM_LOONGARCH       258 // "Loongson Loongarch";
-#define EM_KF32            259 // "ChipON KungFu32";
+#define EM_ARC_COMPACT3_64 253 // Synopsys ARCv2.3 64-bit
+#define EM_MCS6502         254 // MOS Technology MCS 6502 processor
+#define EM_ARC_COMPACT3    255 // Synopsys ARCv2.3 32-bit
+#define EM_KVX             256 // Kalray VLIW core of the MPPA processor family
+#define EM_65816           257 // WDC 65816/65C816
+#define EM_LOONGARCH       258 // Loongson Loongarch
+#define EM_KF32            259 // ChipON KungFu32
 
-#define EM_MT                0x2530 // "Morpho Techologies MT processor";
-#define EM_ALPHA             0x9026 // "Alpha";
-#define EM_WEBASSEMBLY       0x4157 // "Web Assembly";
-#define EM_DLX               0x5aa5 // "OpenDLX";
-#define EM_XSTORMY16         0xad45 // "Sanyo XStormy16 CPU core";
-#define EM_IQ2000            0xFEBA // "Vitesse IQ2000";
+#define EM_MT                0x2530 // Morpho Techologies MT processor
+#define EM_ALPHA             0x9026 // Alpha
+#define EM_WEBASSEMBLY       0x4157 // Web Assembly
+#define EM_DLX               0x5aa5 // OpenDLX
+#define EM_XSTORMY16         0xad45 // Sanyo XStormy16 CPU core
+#define EM_IQ2000            0xFEBA // Vitesse IQ2000
 #define EM_M32C_OLD          0xFEB0
-#define EM_NIOS32            0xFEBB // "Altera Nios";
-#define EM_CYGNUS_MEP        0xF00D // "Toshiba MeP Media Engine";
-#define EM_ADAPTEVA_EPIPHANY 0x1223 // "Adapteva EPIPHANY";
-#define EM_CYGNUS_FRV        0x5441 // "Fujitsu FR-V";
-#define EM_S12Z              0x4DEF // "Freescale S12Z";
+#define EM_NIOS32            0xFEBB // Altera Nios
+#define EM_CYGNUS_MEP        0xF00D // Toshiba MeP Media Engine
+#define EM_ADAPTEVA_EPIPHANY 0x1223 // Adapteva EPIPHANY
+#define EM_CYGNUS_FRV        0x5441 // Fujitsu FR-V
+#define EM_S12Z              0x4DEF // Freescale S12Z
 
 // File version
 #define EV_NONE    0
@@ -578,7 +578,7 @@ typedef Elf_Sword Elf64_Sword;
 // clang-format off
 
 // Note name must be "LINUX"    
-#define NT_PRXFPREG             0x46e62b7f // Contains a user_xfpregs_struct;
+#define NT_PRXFPREG             0x46e62b7f // Contains a user_xfpregs_struct
 #define NT_PPC_VMX              0x100      // PowerPC Altivec/VMX registers
 #define NT_PPC_VSX              0x102      // PowerPC VSX registers
 #define NT_PPC_TAR              0x103      // PowerPC Target Address Register

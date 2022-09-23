@@ -53,8 +53,8 @@ static const struct endian_table_t
 
 static const struct os_abi_table_t
 {
-    const unsigned char  key;
-    const char* str;
+    const unsigned char key;
+    const char*         str;
 } os_abi_table[] = {
     { ELFOSABI_NONE, "UNIX System V" },
     { ELFOSABI_HPUX, "Hewlett-Packard HP-UX" },
@@ -517,8 +517,8 @@ static const struct dynamic_tag_t
     { DT_SYMINFO, "SYMINFO" },
     { DT_ADDRRNGHI, "ADDRRNGHI" },
     { DT_VERSYM, "VERSYM" },
-    { DT_RELACOUNT, "RELACOUNT"},
-    { DT_RELCOUNT, "RELCOUNT"},
+    { DT_RELACOUNT, "RELACOUNT" },
+    { DT_RELCOUNT, "RELCOUNT" },
     { DT_FLAGS_1, "FLAGS_1" },
     { DT_VERDEF, "VERDEF" },
     { DT_VERDEFNUM, "VERDEFNUM" },
@@ -700,9 +700,6 @@ static std::vector<note_tag_t> get_note_tag_table()
 static const std::vector<note_tag_t> note_tag_table = get_note_tag_table();
 // clang-format on
 
-#define NT_LARCH_LBT 0xa04 /* LoongArch Binary Translation registers */
-                           /*   note name must be "CORE".  */
-
 static const ELFIO::Elf_Xword MAX_DATA_ENTRIES = 64;
 
 //------------------------------------------------------------------------------
@@ -731,7 +728,8 @@ class dump
             << std::endl
             << "  ELFVersion: " << str_version( reader.get_elf_version() )
             << std::endl
-            << "  OS/ABI:     " << str_os_abi(reader.get_os_abi()) << std::endl
+            << "  OS/ABI:     " << str_os_abi( reader.get_os_abi() )
+            << std::endl
             << "  ABI Version:" << (int)reader.get_abi_version() << std::endl
             << "  Type:       " << str_type( reader.get_type() ) << std::endl
             << "  Machine:    " << str_machine( reader.get_machine() )
@@ -768,7 +766,7 @@ class dump
         }
 
         for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
-            section* sec = reader.sections[i];
+            const section* sec = reader.sections[i];
             section_header( out, i, sec, reader.get_class() );
         }
 
@@ -845,7 +843,7 @@ class dump
         }
 
         for ( Elf_Half i = 0; i < n; ++i ) {
-            segment* seg = reader.segments[i];
+            const segment* seg = reader.segments[i];
             segment_header( out, i, seg, reader.get_class() );
         }
 
@@ -893,59 +891,57 @@ class dump
     //------------------------------------------------------------------------------
     static void symbol_tables( std::ostream& out, const elfio& reader )
     {
-        Elf_Half n = reader.sections.size();
-        for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
-            section* sec = reader.sections[i];
+        for ( const auto& sec : reader.sections ) { // For all sections
             if ( SHT_SYMTAB == sec->get_type() ||
                  SHT_DYNSYM == sec->get_type() ) {
-                symbol_section_accessor symbols( reader, sec );
+                const_symbol_section_accessor symbols( reader, sec.get() );
 
                 Elf_Xword sym_no = symbols.get_symbols_num();
-                if ( sym_no > 0 ) {
-                    out << "Symbol table (" << sec->get_name() << ")"
-                        << std::endl;
-                    if ( reader.get_class() ==
-                         ELFCLASS32 ) { // Output for 32-bit
-                        out << "[  Nr ] Value      Size       Type    Bind     "
-                               " Sect Name"
-                            << std::endl;
-                    }
-                    else { // Output for 64-bit
-                        out << "[  Nr ] Value              Size               "
-                               "Type    Bind      Sect"
-                            << std::endl
-                            << "        Name" << std::endl;
-                    }
-                    for ( Elf_Xword i = 0; i < sym_no; ++i ) {
-                        std::string   name;
-                        Elf64_Addr    value   = 0;
-                        Elf_Xword     size    = 0;
-                        unsigned char bind    = 0;
-                        unsigned char type    = 0;
-                        Elf_Half      section = 0;
-                        unsigned char other   = 0;
-                        symbols.get_symbol( i, name, value, size, bind, type,
-                                            section, other );
-                        symbol_table( out, i, name, value, size, bind, type,
-                                      section, reader.get_class() );
-                    }
-
-                    out << std::endl;
+                if ( sym_no == 0 ) {
+                    continue;
                 }
+
+                out << "Symbol table (" << sec->get_name() << ")" << std::endl;
+                if ( reader.get_class() == ELFCLASS32 ) { // Output for 32-bit
+                    out << "[  Nr ] Value      Size       Type    Bind     "
+                           " Sect Name"
+                        << std::endl;
+                }
+                else { // Output for 64-bit
+                    out << "[  Nr ] Value              Size               "
+                           "Type    Bind      Sect"
+                        << std::endl
+                        << "        Name" << std::endl;
+                }
+                for ( Elf_Xword i = 0; i < sym_no; ++i ) {
+                    std::string   name;
+                    Elf64_Addr    value   = 0;
+                    Elf_Xword     size    = 0;
+                    unsigned char bind    = 0;
+                    unsigned char type    = 0;
+                    Elf_Half      section = 0;
+                    unsigned char other   = 0;
+                    symbols.get_symbol( i, name, value, size, bind, type,
+                                        section, other );
+                    symbol_table( out, i, name, value, size, bind, type,
+                                  section, reader.get_class() );
+                }
+
+                out << std::endl;
             }
         }
     }
 
     //------------------------------------------------------------------------------
-    static void symbol_table( std::ostream& out,
-                              Elf_Xword     no,
-                              std::string&  name,
-                              Elf64_Addr    value,
-                              Elf_Xword     size,
-                              unsigned char bind,
-                              unsigned char type,
-                              Elf_Half      section,
-                              unsigned int  elf_class )
+    static void symbol_table( std::ostream&      out,
+                              Elf_Xword          no,
+                              const std::string& name,
+                              Elf64_Addr         value,
+                              Elf_Xword          size,
+                              unsigned char      bind,
+                              unsigned char      type,
+                              Elf_Half           section,
+                              unsigned int       elf_class )
     {
         std::ios_base::fmtflags original_flags = out.flags();
 
@@ -975,62 +971,63 @@ class dump
     //------------------------------------------------------------------------------
     static void notes( std::ostream& out, const elfio& reader )
     {
-        Elf_Half no = reader.sections.size();
-        for ( Elf_Half i = 0; i < no; ++i ) { // For all sections
-            section* sec = reader.sections[i];
-            if ( SHT_NOTE == sec->get_type() ) { // Look at notes
-                note_section_accessor notes( reader, sec );
+        for ( const auto& sec : reader.sections ) { // For all sections
+            if ( SHT_NOTE == sec->get_type() ) {    // Look at notes
+                note_section_accessor notes( reader, sec.get() );
                 Elf_Word              no_notes = notes.get_notes_num();
-                if ( no > 0 ) {
-                    out << "Note section (" << sec->get_name() << ")"
-                        << std::endl
-                        << "    No Name         Data size  Description"
-                        << std::endl;
-                    for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
-                        Elf_Word    type;
-                        std::string name;
-                        char*       desc;
-                        Elf_Word    descsz;
 
-                        if ( notes.get_note( j, type, name, desc, descsz ) ) {
-                            // 'name' usually contains \0 at the end. Remove it
-                            name = name.c_str();
-                            note( out, j, type, name, desc, descsz );
-                            out << std::endl;
-                        }
+                if ( no_notes == 0 )
+                    continue;
+
+                out << "Note section (" << sec->get_name() << ")" << std::endl
+                    << "    No Name         Data size  Description"
+                    << std::endl;
+                for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
+                    Elf_Word    type;
+                    std::string name;
+                    char*       desc;
+                    Elf_Word    descsz;
+
+                    if ( notes.get_note( j, type, name, desc, descsz ) ) {
+                        // 'name' usually contains \0 at the end. Remove it
+                        name = name.c_str();
+                        note( out, j, type, name, desc, descsz );
+                        out << std::endl;
                     }
-
-                    out << std::endl;
                 }
+
+                out << std::endl;
             }
         }
 
-        no = reader.segments.size();
+        Elf_Half no = reader.segments.size();
         for ( Elf_Half i = 0; i < no; ++i ) { // For all segments
             segment* seg = reader.segments[i];
             if ( PT_NOTE == seg->get_type() ) { // Look at notes
                 note_segment_accessor notes( reader, seg );
                 Elf_Word              no_notes = notes.get_notes_num();
-                if ( no > 0 ) {
-                    out << "Note segment (" << i << ")" << std::endl
-                        << "    No Name         Data size  Description"
-                        << std::endl;
-                    for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
-                        Elf_Word    type;
-                        std::string name;
-                        char*       desc;
-                        Elf_Word    descsz;
 
-                        if ( notes.get_note( j, type, name, desc, descsz ) ) {
-                            // 'name' usually contains \0 at the end. Remove it
-                            name = name.c_str();
-                            note( out, j, type, name, desc, descsz );
-                            out << std::endl;
-                        }
+                if ( no_notes == 0 )
+                  continue;
+
+                out << "Note segment (" << i << ")" << std::endl
+                    << "    No Name         Data size  Description"
+                    << std::endl;
+                for ( Elf_Word j = 0; j < no_notes; ++j ) { // For all notes
+                    Elf_Word    type;
+                    std::string name;
+                    char*       desc;
+                    Elf_Word    descsz;
+
+                    if ( notes.get_note( j, type, name, desc, descsz ) ) {
+                        // 'name' usually contains \0 at the end. Remove it
+                        name = name.c_str();
+                        note( out, j, type, name, desc, descsz );
+                        out << std::endl;
                     }
-
-                    out << std::endl;
                 }
+
+                out << std::endl;
             }
         }
     }
@@ -1045,7 +1042,7 @@ class dump
     {
         out << "  [" << DUMP_DEC_FORMAT( 2 ) << no << "] ";
 
-        std::vector<note_tag_t>::const_iterator name_group =
+        const std::vector<note_tag_t>::const_iterator name_group =
             std::find_if( note_tag_table.begin(), note_tag_table.end(),
                           match_note_tag_name( name ) );
 
@@ -1083,13 +1080,11 @@ class dump
     //------------------------------------------------------------------------------
     static void modinfo( std::ostream& out, const elfio& reader )
     {
-        Elf_Half no = reader.sections.size();
-        for ( Elf_Half i = 0; i < no; ++i ) { // For all sections
-            section* sec = reader.sections[i];
-            if ( ".modinfo" == sec->get_name() ) { // Look for the section
+        for ( const auto& sec : reader.sections ) { // For all sections
+            if ( ".modinfo" == sec->get_name() ) {  // Look for the section
                 out << "Section .modinfo" << std::endl;
 
-                const_modinfo_section_accessor modinfo( sec );
+                const_modinfo_section_accessor modinfo( sec.get() );
                 for ( Elf_Word i = 0; i < modinfo.get_attribute_num(); i++ ) {
                     std::string field;
                     std::string value;
@@ -1108,41 +1103,39 @@ class dump
     //------------------------------------------------------------------------------
     static void dynamic_tags( std::ostream& out, const elfio& reader )
     {
-        Elf_Half n = reader.sections.size();
-        for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
-            section* sec = reader.sections[i];
+        for ( const auto& sec : reader.sections ) { // For all sections
             if ( SHT_DYNAMIC == sec->get_type() ) {
-                dynamic_section_accessor dynamic( reader, sec );
+                dynamic_section_accessor dynamic( reader, sec.get() );
 
                 Elf_Xword dyn_no = dynamic.get_entries_num();
-                if ( dyn_no > 0 ) {
-                    out << "Dynamic section (" << sec->get_name() << ")"
-                        << std::endl;
-                    out << "[  Nr ] Tag              Name/Value" << std::endl;
-                    for ( Elf_Xword i = 0; i < dyn_no; ++i ) {
-                        Elf_Xword   tag   = 0;
-                        Elf_Xword   value = 0;
-                        std::string str;
-                        dynamic.get_entry( i, tag, value, str );
-                        dynamic_tag( out, i, tag, value, str,
-                                     reader.get_class() );
-                        if ( DT_NULL == tag ) {
-                            break;
-                        }
-                    }
+                if ( dyn_no == 0 )
+                    continue;
 
-                    out << std::endl;
+                out << "Dynamic section (" << sec->get_name() << ")"
+                    << std::endl;
+                out << "[  Nr ] Tag              Name/Value" << std::endl;
+                for ( Elf_Xword i = 0; i < dyn_no; ++i ) {
+                    Elf_Xword   tag   = 0;
+                    Elf_Xword   value = 0;
+                    std::string str;
+                    dynamic.get_entry( i, tag, value, str );
+                    dynamic_tag( out, i, tag, value, str, reader.get_class() );
+                    if ( DT_NULL == tag ) {
+                        break;
+                    }
                 }
+
+                out << std::endl;
             }
         }
     }
 
     //------------------------------------------------------------------------------
-    static void dynamic_tag( std::ostream& out,
-                             Elf_Xword     no,
-                             Elf_Xword     tag,
-                             Elf_Xword     value,
-                             std::string   str,
+    static void dynamic_tag( std::ostream&      out,
+                             Elf_Xword          no,
+                             Elf_Xword          tag,
+                             Elf_Xword          value,
+                             const std::string& str,
                              unsigned int /*elf_class*/ )
     {
         out << "[" << DUMP_DEC_FORMAT( 5 ) << no << "] "
@@ -1200,7 +1193,7 @@ class dump
         out << "Section Data:" << std::endl;
 
         for ( Elf_Half i = 1; i < n; ++i ) { // For all sections
-            section* sec = reader.sections[i];
+            const section* sec = reader.sections[i];
             if ( sec->get_type() == SHT_NOBITS ) {
                 continue;
             }
@@ -1255,7 +1248,7 @@ class dump
         out << "Segment Data:" << std::endl;
 
         for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
-            segment* seg = reader.segments[i];
+            const segment* seg = reader.segments[i];
             segment_data( out, i, seg );
         }
 
