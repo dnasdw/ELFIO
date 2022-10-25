@@ -527,6 +527,11 @@ typedef Elf_Sword Elf64_Sword;
 #define SHT_ARM_OVERLAYSECTION 0x70000005
 #define SHT_HIPROC             0x7FFFFFFF
 #define SHT_LOUSER             0x80000000
+// Used by Nintendo Wii U
+constexpr Elf_Word SHT_RPL_EXPORTS    = 0x80000001;
+constexpr Elf_Word SHT_RPL_IMPORTS    = 0x80000002;
+constexpr Elf_Word SHT_RPL_CRCS       = 0x80000003;
+constexpr Elf_Word SHT_RPL_FILEINFO   = 0x80000004;
 #define SHT_HIUSER             0xFFFFFFFF
 
 // Section attribute flags
@@ -543,6 +548,8 @@ typedef Elf_Sword Elf64_Sword;
 #define SHF_COMPRESSED       0x800
 #define SHF_GNU_RETAIN       0x200000
 #define SHF_GNU_MBIND        0x01000000
+// flag used in Nintendo RPX/RPL to indicate section data is zlib-compressed
+constexpr Elf_Xword SHF_RPX_DEFLATE      = 0x08000000;
 #define SHF_MASKOS           0x0FF00000
 #define SHF_MIPS_GPREL       0x10000000
 #define SHF_ORDERED          0x40000000
