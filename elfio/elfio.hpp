@@ -66,10 +66,15 @@ class elfio
   public:
     //------------------------------------------------------------------------------
     elfio() noexcept
-        : sections( this ), segments( this ), header( nullptr ),
-          current_file_pos( 0 )
+        : sections( this ), segments( this ), zlib(nullptr),
+          header( nullptr ), current_file_pos( 0 )
     {
         create( ELFCLASS32, ELFDATA2LSB );
+    }
+
+    elfio( wiiu_zlib_interface *zlib ) noexcept : sections( this ), segments( this ), zlib( std::shared_ptr<wiiu_zlib_interface>(zlib) )
+    {
+        elfio();
     }
 
 #if defined( _MSC_VER ) && _MSC_VER < 1600
@@ -111,10 +116,12 @@ class elfio
         segments_       = std::move( other.segments_ );
         convertor       = std::move( other.convertor );
         addr_translator = std::move( other.addr_translator );
+        zlib            = std::move( other.zlib );
 
         other.header = nullptr;
         other.sections_.clear();
         other.segments_.clear();
+        other.zlib = nullptr;
     }
 
     elfio& operator=( elfio&& other ) noexcept
@@ -126,9 +133,11 @@ class elfio
             convertor        = std::move( other.convertor );
             addr_translator  = std::move( other.addr_translator );
             current_file_pos = other.current_file_pos;
+            zlib             = std::move( other.zlib );
 
             other.current_file_pos = 0;
             other.header           = nullptr;
+            other.zlib             = nullptr;
             other.sections_.clear();
             other.segments_.clear();
         }
@@ -453,11 +462,11 @@ class elfio
 
         if ( file_class == ELFCLASS64 ) {
             sections_.emplace_back(
-                new section_impl<Elf64_Shdr>( &convertor, &addr_translator ) );
+                new section_impl<Elf64_Shdr>( &convertor, &addr_translator, zlib ) );
         }
         else if ( file_class == ELFCLASS32 ) {
             sections_.emplace_back(
-                new section_impl<Elf32_Shdr>( &convertor, &addr_translator ) );
+                new section_impl<Elf32_Shdr>( &convertor, &addr_translator, zlib ) );
         }
         else {
             sections_.pop_back();
@@ -1122,6 +1131,7 @@ class elfio
     std::vector<std::unique_ptr<segment>> segments_;
     endianess_convertor                   convertor;
     address_translator                    addr_translator;
+    std::shared_ptr<wiiu_zlib_interface>  zlib = nullptr;
 
     Elf_Xword current_file_pos;
 };
