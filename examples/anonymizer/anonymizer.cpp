@@ -97,8 +97,7 @@ int main( int argc, char** argv )
           it != reader.sections.end(); ++it ) {
         const std::unique_ptr<section>& section = *it;
         if ( section->get_type() == SHT_STRTAB &&
-             std::string( section->get_name() ) ==
-                 std::string( ".strtab" ) ) {
+             std::string( section->get_name() ) == std::string( ".strtab" ) ) {
             process_string_table( section.get(), filename );
         }
     }
