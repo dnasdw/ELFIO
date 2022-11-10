@@ -175,7 +175,7 @@ template <class T> class segment_impl : public segment
     //------------------------------------------------------------------------------
 
     //------------------------------------------------------------------------------
-    void set_offset( Elf64_Off value ) override
+    void set_offset( const Elf64_Off& value ) override
     {
         ph.p_offset =
             typename segment_header_impl_types<T>::Phdr_offset_type( value );
@@ -193,7 +193,7 @@ template <class T> class segment_impl : public segment
     }
 
     //------------------------------------------------------------------------------
-    void set_index( Elf_Half value ) override { index = value; }
+    void set_index( const Elf_Half& value ) override { index = value; }
 
     //------------------------------------------------------------------------------
     bool load( std::istream& stream, std::streampos header_offset ) override

@@ -29,24 +29,24 @@ THE SOFTWARE.
 #define ELFIO_GET_ACCESS_DECL( TYPE, NAME ) virtual TYPE get_##NAME() const = 0
 
 #define ELFIO_SET_ACCESS_DECL( TYPE, NAME ) \
-    virtual void set_##NAME( TYPE value ) = 0
+    virtual void set_##NAME( const TYPE& value ) = 0
 
-#define ELFIO_GET_SET_ACCESS_DECL( TYPE, NAME ) \
-    virtual TYPE get_##NAME() const       = 0;  \
-    virtual void set_##NAME( TYPE value ) = 0
+#define ELFIO_GET_SET_ACCESS_DECL( TYPE, NAME )       \
+    virtual TYPE get_##NAME() const              = 0; \
+    virtual void set_##NAME( const TYPE& value ) = 0
 
 #define ELFIO_GET_ACCESS( TYPE, NAME, FIELD ) \
     TYPE get_##NAME() const override { return ( *convertor )( FIELD ); }
 
-#define ELFIO_SET_ACCESS( TYPE, NAME, FIELD ) \
-    void set_##NAME( TYPE value ) override    \
-    {                                         \
-        FIELD = value;                        \
-        FIELD = ( *convertor )( FIELD );      \
+#define ELFIO_SET_ACCESS( TYPE, NAME, FIELD )     \
+    void set_##NAME( const TYPE& value ) override \
+    {                                             \
+        FIELD = value;                            \
+        FIELD = ( *convertor )( FIELD );          \
     }
 
 #define ELFIO_SET_ACCESS_4( TYPE, NAME, FIELD, FIELD_TYPE ) \
-    void set_##NAME( TYPE value ) override                  \
+    void set_##NAME( const TYPE& value ) override           \
     {                                                       \
         FIELD = FIELD_TYPE( value );                        \
         FIELD = ( *convertor )( FIELD );                    \
@@ -54,7 +54,7 @@ THE SOFTWARE.
 
 #define ELFIO_GET_SET_ACCESS( TYPE, NAME, FIELD )                        \
     TYPE get_##NAME() const override { return ( *convertor )( FIELD ); } \
-    void set_##NAME( TYPE value ) override                               \
+    void set_##NAME( const TYPE& value ) override                        \
     {                                                                    \
         FIELD = value;                                                   \
         FIELD = ( *convertor )( FIELD );                                 \
@@ -62,7 +62,7 @@ THE SOFTWARE.
 
 #define ELFIO_GET_SET_ACCESS_4( TYPE, NAME, FIELD, FIELD_TYPE )          \
     TYPE get_##NAME() const override { return ( *convertor )( FIELD ); } \
-    void set_##NAME( TYPE value ) override                               \
+    void set_##NAME( const TYPE& value ) override                        \
     {                                                                    \
         FIELD = FIELD_TYPE( value );                                     \
         FIELD = ( *convertor )( FIELD );                                 \
