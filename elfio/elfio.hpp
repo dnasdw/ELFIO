@@ -66,13 +66,15 @@ class elfio
   public:
     //------------------------------------------------------------------------------
     elfio() noexcept
-        : sections( this ), segments( this ), zlib(), header( nullptr ),
+        : sections( this ), segments( this ), compression(), header( nullptr ),
           current_file_pos( 0 )
     {
         create( ELFCLASS32, ELFDATA2LSB );
     }
 
-    elfio( wiiu_zlib_interface *zlib ) noexcept : sections( this ), segments( this ), zlib( std::shared_ptr<wiiu_zlib_interface>(zlib) )
+    elfio( compression_interface* compression ) noexcept
+        : sections( this ), segments( this ),
+          compression( std::shared_ptr<compression_interface>( compression ) )
     {
         elfio();
     }
@@ -118,12 +120,12 @@ class elfio
         segments_       = std::move( other.segments_ );
         convertor       = std::move( other.convertor );
         addr_translator = std::move( other.addr_translator );
-        zlib            = std::move( other.zlib );
+        compression     = std::move( other.compression );
 
         other.header = nullptr;
         other.sections_.clear();
         other.segments_.clear();
-        other.zlib = nullptr;
+        other.compression = nullptr;
     }
 
     elfio& operator=( elfio&& other ) noexcept
@@ -135,11 +137,11 @@ class elfio
             convertor        = std::move( other.convertor );
             addr_translator  = std::move( other.addr_translator );
             current_file_pos = other.current_file_pos;
-            zlib             = std::move( other.zlib );
+            compression      = std::move( other.compression );
 
             other.current_file_pos = 0;
             other.header           = nullptr;
-            other.zlib             = nullptr;
+            other.compression      = nullptr;
             other.sections_.clear();
             other.segments_.clear();
         }
@@ -463,12 +465,12 @@ class elfio
         unsigned char file_class = get_class();
 
         if ( file_class == ELFCLASS64 ) {
-            sections_.emplace_back(
-                new section_impl<Elf64_Shdr>( &convertor, &addr_translator, zlib ) );
+            sections_.emplace_back( new section_impl<Elf64_Shdr>(
+                &convertor, &addr_translator, compression ) );
         }
         else if ( file_class == ELFCLASS32 ) {
-            sections_.emplace_back(
-                new section_impl<Elf32_Shdr>( &convertor, &addr_translator, zlib ) );
+            sections_.emplace_back( new section_impl<Elf32_Shdr>(
+                &convertor, &addr_translator, compression ) );
         }
         else {
             sections_.pop_back();
@@ -1128,12 +1130,12 @@ class elfio
 
     //------------------------------------------------------------------------------
   private:
-    std::unique_ptr<elf_header>           header;
-    std::vector<std::unique_ptr<section>> sections_;
-    std::vector<std::unique_ptr<segment>> segments_;
-    endianess_convertor                   convertor;
-    address_translator                    addr_translator;
-    std::shared_ptr<wiiu_zlib_interface>  zlib;
+    std::unique_ptr<elf_header>            header;
+    std::vector<std::unique_ptr<section>>  sections_;
+    std::vector<std::unique_ptr<segment>>  segments_;
+    endianess_convertor                    convertor;
+    address_translator                     addr_translator;
+    std::shared_ptr<compression_interface> compression;
 
     Elf_Xword current_file_pos;
 };

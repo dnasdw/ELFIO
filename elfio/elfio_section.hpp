@@ -93,12 +93,12 @@ template <class T> class section_impl : public section
 {
   public:
     //------------------------------------------------------------------------------
-    section_impl( const endianess_convertor* convertor,
-                  const address_translator*  translator,
-                  const std::shared_ptr<wiiu_zlib_interface> &zlib )
-        : convertor( convertor ), translator( translator ), zlib(zlib),
-          header(), index( 0 ), data_size( 0 ), is_address_set( false ),
-          stream_size( 0 )
+    section_impl( const endianess_convertor*                    convertor,
+                  const address_translator*                     translator,
+                  const std::shared_ptr<compression_interface>& compression )
+        : convertor( convertor ), translator( translator ),
+          compression( compression ), header(), index( 0 ), data_size( 0 ),
+          is_address_set( false ), stream_size( 0 )
     {
     }
 
@@ -264,28 +264,36 @@ template <class T> class section_impl : public section
                     return false;
                 }
 
-                if(get_flags() & SHF_RPX_DEFLATE) {
-                    if(!zlib) {
-                        std::cerr << "WARN: compressed section found but no zlib implementation provided. Skipping." << std::endl;
+                if ( ( get_flags() & SHF_RPX_DEFLATE ) ||
+                     ( get_flags() & SHF_COMPRESSED ) ) {
+                    if ( !compression ) {
+                        std::cerr
+                            << "WARN: compressed section found but no "
+                               "compression implementation provided. Skipping."
+                            << std::endl;
                         data = nullptr;
                         return false;
                     }
                     // at this point, data holds the whole compressed stream
-                    Elf_Xword uncompressed_size = 0;
-                    std::unique_ptr<char[]> decompressed_data = zlib->inflate(data.get(), convertor, size, uncompressed_size);
-                    if(decompressed_data == nullptr) {
-                        std::cerr << "Failed to decompress section data." << std::endl;
+                    Elf_Xword               uncompressed_size = 0;
+                    std::unique_ptr<char[]> decompressed_data =
+                        compression->inflate( data.get(), convertor, size,
+                                              uncompressed_size );
+                    if ( decompressed_data == nullptr ) {
+                        std::cerr << "Failed to decompress section data."
+                                  << std::endl;
                         data = nullptr;
                         return false;
                     }
 
-                    set_size(uncompressed_size);
+                    set_size( uncompressed_size );
 
-                    data = std::move(decompressed_data);
+                    data = std::move( decompressed_data );
                 }
                 // refresh size because it may have changed if we had to decompress data
                 size = get_size();
-                data.get()[size] = 0; // Ensure data is ended with 0 to avoid oob read
+                data.get()[size] =
+                    0; // Ensure data is ended with 0 to avoid oob read
                 data_size = Elf_Word( size );
             }
             else {
@@ -330,28 +338,32 @@ template <class T> class section_impl : public section
     {
         adjust_stream_size( stream, data_offset );
 
-        if( (get_flags() & SHF_RPX_DEFLATE) && zlib) {
-            Elf_Xword decompressed_size = get_size();
-            Elf_Xword compressed_size = 0;
-            std::unique_ptr<char[]> compressed_ptr = zlib->deflate(data.get(), convertor, decompressed_size, compressed_size);
-            stream.write( compressed_ptr.get(), compressed_size);
-        } else {
+        if ( ( ( get_flags() & SHF_COMPRESSED ) ||
+               ( get_flags() & SHF_RPX_DEFLATE ) ) &&
+             compression ) {
+            Elf_Xword               decompressed_size = get_size();
+            Elf_Xword               compressed_size   = 0;
+            std::unique_ptr<char[]> compressed_ptr    = compression->deflate(
+                data.get(), convertor, decompressed_size, compressed_size );
+            stream.write( compressed_ptr.get(), compressed_size );
+        }
+        else {
             stream.write( get_data(), get_size() );
         }
     }
 
     //------------------------------------------------------------------------------
   private:
-    T                          header;
-    Elf_Half                   index;
-    std::string                name;
-    std::unique_ptr<char[]>    data;
-    Elf_Word                   data_size;
-    const endianess_convertor* convertor;
-    const address_translator*  translator;
-    const std::shared_ptr<wiiu_zlib_interface> zlib;
-    bool                       is_address_set;
-    size_t                     stream_size;
+    T                                            header;
+    Elf_Half                                     index;
+    std::string                                  name;
+    std::unique_ptr<char[]>                      data;
+    Elf_Word                                     data_size;
+    const endianess_convertor*                   convertor;
+    const address_translator*                    translator;
+    const std::shared_ptr<compression_interface> compression;
+    bool                                         is_address_set;
+    size_t                                       stream_size;
 };
 
 } // namespace ELFIO

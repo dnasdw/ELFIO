@@ -548,7 +548,7 @@ typedef Elf_Sword Elf64_Sword;
 #define SHF_COMPRESSED       0x800
 #define SHF_GNU_RETAIN       0x200000
 #define SHF_GNU_MBIND        0x01000000
-// flag used in Nintendo RPX/RPL to indicate section data is zlib-compressed
+// flag used in Nintendo RPX/RPL to indicate section data is compressed
 #define SHF_RPX_DEFLATE 0x08000000
 #define SHF_MASKOS      0x0FF00000
 #define SHF_MIPS_GPREL  0x10000000
@@ -1320,6 +1320,23 @@ struct Elf64_auxv
     union {
         uint64_t a_val; // Integer value, usually a pointer
     } a_un;
+};
+
+struct Elf32_Chdr
+{
+    Elf32_Word ch_type; // The compression algorithm used
+    Elf32_Word ch_size; //The size, in	bytes, of the uncompressed section data
+    Elf32_Word
+        ch_addralign; // The address alignment of the	uncompressed section data
+};
+
+struct Elf64_Chdr
+{
+    Elf64_Word ch_type;     //The compression algorithm used
+    Elf64_Word ch_reserved; // Reserved
+    Elf_Xword  ch_size; //The size, in	bytes, of the uncompressed section data
+    Elf_Xword
+        ch_addralign; //The address alignment of the	uncompressed section data
 };
 
 #ifdef __cplusplus
