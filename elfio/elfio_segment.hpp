@@ -84,7 +84,7 @@ class segment
 
     virtual bool load( std::istream&  stream,
                        std::streampos header_offset,
-                       bool           is_lazy = false )       = 0;
+                       bool           is_lazy )               = 0;
     virtual void save( std::ostream&  stream,
                        std::streampos header_offset,
                        std::streampos data_offset ) = 0;
@@ -135,7 +135,7 @@ template <class T> class segment_impl : public segment
     ELFIO_GET_ACCESS( Elf64_Off, offset, ph.p_offset );
 
     //------------------------------------------------------------------------------
-    Elf_Half get_index() const override { return index; }
+    Elf_Half get_index() const noexcept override { return index; }
 
     //------------------------------------------------------------------------------
     const char* get_data() const override
@@ -186,7 +186,7 @@ template <class T> class segment_impl : public segment
     //------------------------------------------------------------------------------
 
     //------------------------------------------------------------------------------
-    void set_offset( const Elf64_Off& value ) override
+    void set_offset( const Elf64_Off& value ) noexcept override
     {
         ph.p_offset =
             typename segment_header_impl_types<T>::Phdr_offset_type( value );
@@ -204,12 +204,12 @@ template <class T> class segment_impl : public segment
     }
 
     //------------------------------------------------------------------------------
-    void set_index( const Elf_Half& value ) override { index = value; }
+    void set_index( const Elf_Half& value ) noexcept override { index = value; }
 
     //------------------------------------------------------------------------------
     bool load( std::istream&  stream,
                std::streampos header_offset,
-               bool           is_lazy_ = false ) override
+               bool           is_lazy_ ) override
     {
         pstream = &stream;
         is_lazy = is_lazy_;
@@ -233,6 +233,7 @@ template <class T> class segment_impl : public segment
         return true;
     }
 
+    //------------------------------------------------------------------------------
     bool load_data() const
     {
         if ( PT_NULL == get_type() || 0 == get_file_size() ) {
@@ -242,7 +243,7 @@ template <class T> class segment_impl : public segment
         pstream->seekg( ( *translator )[( *convertor )( ph.p_offset )] );
         Elf_Xword size = get_file_size();
 
-        if ( size > get_stream_size() || is_lazy ) {
+        if ( size > get_stream_size() ) {
             data = nullptr;
         }
         else {
@@ -250,6 +251,7 @@ template <class T> class segment_impl : public segment
 
             if ( nullptr != data.get() && pstream->read( data.get(), size ) ) {
                 data.get()[size] = 0;
+                is_lazy          = false;
             }
             else {
                 data = nullptr;
