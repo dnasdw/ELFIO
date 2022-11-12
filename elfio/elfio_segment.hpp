@@ -143,7 +143,6 @@ template <class T> class segment_impl : public segment
     {
         if ( is_lazy ) {
             load_data();
-            is_lazy = false;
         }
         return data.get();
     }
@@ -241,6 +240,7 @@ template <class T> class segment_impl : public segment
     //------------------------------------------------------------------------------
     bool load_data() const noexcept
     {
+        is_lazy = false;
         if ( PT_NULL == get_type() || 0 == get_file_size() ) {
             return true;
         }
@@ -256,7 +256,6 @@ template <class T> class segment_impl : public segment
 
             if ( nullptr != data.get() && pstream->read( data.get(), size ) ) {
                 data.get()[size] = 0;
-                is_lazy          = false;
             }
             else {
                 data = nullptr;
