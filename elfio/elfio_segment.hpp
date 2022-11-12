@@ -64,7 +64,7 @@ class segment
 
     virtual bool load( std::istream&  stream,
                        std::streampos header_offset,
-                       bool           is_lazy = false )       = 0;
+                       bool           is_lazy )               = 0;
     virtual void save( std::ostream&  stream,
                        std::streampos header_offset,
                        std::streampos data_offset ) = 0;
@@ -75,17 +75,11 @@ template <class T> class segment_impl : public segment
 {
   public:
     //------------------------------------------------------------------------------
-    segment_impl( const endianess_convertor* convertor_,
-                  const address_translator*  translator_ )
-        : pstream( nullptr ), index( 0 ), data( nullptr ),
-          convertor( convertor_ ), translator( translator_ ), stream_size( 0 ),
-          is_offset_set( false ), is_lazy( false )
+    segment_impl( const endianess_convertor* convertor,
+                  const address_translator*  translator )
+        : convertor( convertor ), translator( translator )
     {
-        std::fill_n( reinterpret_cast<char*>( &ph ), sizeof( ph ), '\0' );
     }
-
-    //------------------------------------------------------------------------------
-    ~segment_impl() override { delete[] data; }
 
     //------------------------------------------------------------------------------
     // Section info functions
@@ -99,7 +93,7 @@ template <class T> class segment_impl : public segment
     ELFIO_GET_ACCESS( Elf64_Off, offset, ph.p_offset );
 
     //------------------------------------------------------------------------------
-    Elf_Half get_index() const override { return index; }
+    Elf_Half get_index() const noexcept override { return index; }
 
     //------------------------------------------------------------------------------
     const char* get_data() const override
@@ -108,7 +102,7 @@ template <class T> class segment_impl : public segment
             load_data();
             is_lazy = false;
         }
-        return data;
+        return data.get();
     }
 
     //------------------------------------------------------------------------------
@@ -150,7 +144,7 @@ template <class T> class segment_impl : public segment
     //------------------------------------------------------------------------------
 
     //------------------------------------------------------------------------------
-    void set_offset( Elf64_Off value ) override
+    void set_offset( const Elf64_Off& value ) noexcept override
     {
         ph.p_offset   = decltype( ph.p_offset )( value );
         ph.p_offset   = ( *convertor )( ph.p_offset );
@@ -167,18 +161,18 @@ template <class T> class segment_impl : public segment
     }
 
     //------------------------------------------------------------------------------
-    void set_index( Elf_Half value ) override { index = value; }
+    void set_index( const Elf_Half& value ) noexcept override { index = value; }
 
     //------------------------------------------------------------------------------
     bool load( std::istream&  stream,
                std::streampos header_offset,
-               bool           is_lazy_ = false ) override
+               bool           is_lazy_ ) override
     {
         pstream = &stream;
         is_lazy = is_lazy_;
 
         if ( translator->empty() ) {
-            stream.seekg( 0, stream.end );
+            stream.seekg( 0, std::istream::end );
             set_stream_size( size_t( stream.tellg() ) );
         }
         else {
@@ -196,22 +190,29 @@ template <class T> class segment_impl : public segment
         return true;
     }
 
+    //------------------------------------------------------------------------------
     bool load_data() const
     {
-        if ( PT_NULL != get_type() && 0 != get_file_size() ) {
-            pstream->seekg( ( *translator )[( *convertor )( ph.p_offset )] );
-            Elf_Xword size = get_file_size();
+        if ( PT_NULL == get_type() || 0 == get_file_size() ) {
+            return true;
+        }
 
-            if ( size > get_stream_size() || is_lazy ) {
-                data = nullptr;
+        pstream->seekg( ( *translator )[( *convertor )( ph.p_offset )] );
+        Elf_Xword size = get_file_size();
+
+        if ( size > get_stream_size() ) {
+            data = nullptr;
+        }
+        else {
+            data.reset( new ( std::nothrow ) char[(size_t)size + 1] );
+
+            if ( nullptr != data.get() && pstream->read( data.get(), size ) ) {
+                data.get()[size] = 0;
+                is_lazy          = false;
             }
             else {
-                data = new ( std::nothrow ) char[(size_t)size + 1];
-
-                if ( nullptr != data ) {
-                    pstream->read( data, size );
-                    data[size] = 0;
-                }
+                data = nullptr;
+                return false;
             }
         }
 
@@ -237,16 +238,16 @@ template <class T> class segment_impl : public segment
 
     //------------------------------------------------------------------------------
   private:
-    mutable std::istream*      pstream;
-    T                          ph;
-    Elf_Half                   index;
-    mutable char*              data;
-    std::vector<Elf_Half>      sections;
-    const endianess_convertor* convertor;
-    const address_translator*  translator;
-    size_t                     stream_size;
-    bool                       is_offset_set;
-    mutable bool               is_lazy;
+    mutable std::istream*           pstream = nullptr;
+    T                               ph      = { 0 };
+    Elf_Half                        index   = 0;
+    mutable std::unique_ptr<char[]> data;
+    std::vector<Elf_Half>           sections;
+    const endianess_convertor*      convertor     = nullptr;
+    const address_translator*       translator    = nullptr;
+    size_t                          stream_size   = 0;
+    bool                            is_offset_set = false;
+    mutable bool                    is_lazy       = false;
 };
 
 } // namespace ELFIO
