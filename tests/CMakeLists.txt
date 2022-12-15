@@ -1,9 +1,18 @@
 include(FetchContent)
 
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/refs/tags/release-1.8.1.zip
-)
+if(${CMAKE_VERSION} VERSION_LESS "3.24.0")
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/release-1.8.1.zip
+    )
+else()
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/release-1.8.1.zip
+        FIND_PACKAGE_ARGS NAMES GTest
+        DOWNLOAD_EXTRACT_TIMESTAMP = TRUE
+    )
+endif()
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
