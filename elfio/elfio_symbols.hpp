@@ -26,6 +26,9 @@ THE SOFTWARE.
 namespace ELFIO {
 
 //------------------------------------------------------------------------------
+// @class symbol_section_accessor_template
+// @brief A template class for accessing symbol sections in an ELF file.
+//------------------------------------------------------------------------------
 template <class S> class symbol_section_accessor_template
 {
   public:
@@ -48,6 +51,10 @@ template <class S> class symbol_section_accessor_template
     };
 
     //------------------------------------------------------------------------------
+    // @brief Constructor
+    // @param elf_file Reference to the ELF file
+    // @param symbol_section Pointer to the symbol section
+    //------------------------------------------------------------------------------
     explicit symbol_section_accessor_template( const elfio& elf_file,
                                                S*           symbol_section )
         : elf_file( elf_file ), symbol_section( symbol_section )
@@ -55,6 +62,9 @@ template <class S> class symbol_section_accessor_template
         find_hash_section();
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Get the number of symbols in the section
+    // @return Number of symbols
     //------------------------------------------------------------------------------
     Elf_Xword get_symbols_num() const
     {
@@ -82,6 +92,17 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Get the symbol at the specified index
+    // @param index Index of the symbol
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param section_index Section index of the symbol
+    // @param other Other attributes of the symbol
+    // @return True if the symbol is found, false otherwise
+    //------------------------------------------------------------------------------
     bool get_symbol( Elf_Xword      index,
                      std::string&   name,
                      Elf64_Addr&    value,
@@ -105,6 +126,16 @@ template <class S> class symbol_section_accessor_template
         return ret;
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Get the symbol with the specified name
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param section_index Section index of the symbol
+    // @param other Other attributes of the symbol
+    // @return True if the symbol is found, false otherwise
     //------------------------------------------------------------------------------
     bool get_symbol( const std::string& name,
                      Elf64_Addr&        value,
@@ -149,6 +180,16 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Get the symbol with the specified value
+    // @param value Value of the symbol
+    // @param name Name of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param section_index Section index of the symbol
+    // @param other Other attributes of the symbol
+    // @return True if the symbol is found, false otherwise
+    //------------------------------------------------------------------------------
     bool get_symbol( const Elf64_Addr& value,
                      std::string&      name,
                      Elf_Xword&        size,
@@ -182,6 +223,15 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Add a symbol to the section
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param info Info of the symbol
+    // @param other Other attributes of the symbol
+    // @param shndx Section index of the symbol
+    // @return Index of the added symbol
+    //------------------------------------------------------------------------------
     Elf_Word add_symbol( Elf_Word      name,
                          Elf64_Addr    value,
                          Elf_Xword     size,
@@ -213,6 +263,16 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Add a symbol to the section
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param other Other attributes of the symbol
+    // @param shndx Section index of the symbol
+    // @return Index of the added symbol
+    //------------------------------------------------------------------------------
     Elf_Word add_symbol( Elf_Word      name,
                          Elf64_Addr    value,
                          Elf_Xword     size,
@@ -225,6 +285,16 @@ template <class S> class symbol_section_accessor_template
                            shndx );
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Add a symbol to the section
+    // @param pStrWriter String section accessor
+    // @param str Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param info Info of the symbol
+    // @param other Other attributes of the symbol
+    // @param shndx Section index of the symbol
+    // @return Index of the added symbol
     //------------------------------------------------------------------------------
     Elf_Word add_symbol( string_section_accessor& pStrWriter,
                          const char*              str,
@@ -239,6 +309,17 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Add a symbol to the section
+    // @param pStrWriter String section accessor
+    // @param str Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param other Other attributes of the symbol
+    // @param shndx Section index of the symbol
+    // @return Index of the added symbol
+    //------------------------------------------------------------------------------
     Elf_Word add_symbol( string_section_accessor& pStrWriter,
                          const char*              str,
                          Elf64_Addr               value,
@@ -252,6 +333,10 @@ template <class S> class symbol_section_accessor_template
                            ELF_ST_INFO( bind, type ), other, shndx );
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Arrange local symbols in the section
+    // @param func Function to be called for each pair of symbols
+    // @return Number of local symbols
     //------------------------------------------------------------------------------
     Elf_Xword arrange_local_symbols( symbol_callback& func =
         symbol_callback::default_callback() )
@@ -288,6 +373,8 @@ template <class S> class symbol_section_accessor_template
     };
 
     //------------------------------------------------------------------------------
+    // @brief Find the hash section
+    //------------------------------------------------------------------------------
     void find_hash_section()
     {
         Elf_Half nSecNo = elf_file.sections.size();
@@ -305,14 +392,30 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Get the index of the string table
+    // @return Index of the string table
+    //------------------------------------------------------------------------------
     Elf_Half get_string_table_index() const
     {
         return (Elf_Half)symbol_section->get_link();
     }
 
     //------------------------------------------------------------------------------
+    // @brief Get the index of the hash table
+    // @return Index of the hash table
+    //------------------------------------------------------------------------------
     Elf_Half get_hash_table_index() const { return hash_section_index; }
 
+    //------------------------------------------------------------------------------
+    // @brief Lookup a symbol in the hash table
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param section_index Section index of the symbol
+    // @param other Other attributes of the symbol
+    // @return True if the symbol is found, false otherwise
     //------------------------------------------------------------------------------
     bool hash_lookup( const std::string& name,
                       Elf64_Addr&        value,
@@ -351,6 +454,16 @@ template <class S> class symbol_section_accessor_template
         return ret;
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Lookup a symbol in the GNU hash table
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param section_index Section index of the symbol
+    // @param other Other attributes of the symbol
+    // @return True if the symbol is found, false otherwise
     //------------------------------------------------------------------------------
     template <class T>
     bool gnu_hash_lookup( const std::string& name,
@@ -420,6 +533,10 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Get the symbol at the specified index
+    // @param index Index of the symbol
+    // @return Pointer to the symbol
+    //------------------------------------------------------------------------------
     template <class T> const T* generic_get_symbol_ptr( Elf_Xword index ) const
     {
         if ( 0 != symbol_section->get_data() && index < get_symbols_num() ) {
@@ -436,6 +553,11 @@ template <class S> class symbol_section_accessor_template
         return 0;
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Search for a symbol in the section
+    // @param match Function to be called for each symbol
+    // @param idx Index of the found symbol
+    // @return True if the symbol is found, false otherwise
     //------------------------------------------------------------------------------
     template <class T>
     bool generic_search_symbols( symbol_matcher<T> match, Elf_Xword& idx ) const
@@ -455,6 +577,17 @@ template <class S> class symbol_section_accessor_template
         return false;
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Get the symbol at the specified index
+    // @param index Index of the symbol
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param bind Binding of the symbol
+    // @param type Type of the symbol
+    // @param section_index Section index of the symbol
+    // @param other Other attributes of the symbol
+    // @return True if the symbol is found, false otherwise
     //------------------------------------------------------------------------------
     template <class T>
     bool generic_get_symbol( Elf_Xword      index,
@@ -498,6 +631,15 @@ template <class S> class symbol_section_accessor_template
     }
 
     //------------------------------------------------------------------------------
+    // @brief Add a symbol to the section
+    // @param name Name of the symbol
+    // @param value Value of the symbol
+    // @param size Size of the symbol
+    // @param info Info of the symbol
+    // @param other Other attributes of the symbol
+    // @param shndx Section index of the symbol
+    // @return Index of the added symbol
+    //------------------------------------------------------------------------------
     template <class T>
     Elf_Word generic_add_symbol( Elf_Word      name,
                                  Elf64_Addr    value,
@@ -527,6 +669,10 @@ template <class S> class symbol_section_accessor_template
         return nRet;
     }
 
+    //------------------------------------------------------------------------------
+    // @brief Arrange local symbols in the section
+    // @param func Function to be called for each pair of symbols
+    // @return Number of local symbols
     //------------------------------------------------------------------------------
     template <class T>
     Elf_Xword generic_arrange_local_symbols( symbol_callback& func )
@@ -575,10 +721,10 @@ template <class S> class symbol_section_accessor_template
 
     //------------------------------------------------------------------------------
   private:
-    const elfio&   elf_file;
-    S*             symbol_section;
-    Elf_Half       hash_section_index{ 0 };
-    const section* hash_section{ nullptr };
+    const elfio&   elf_file;                ///< Reference to the ELF file
+    S*             symbol_section;          ///< Pointer to the symbol section
+    Elf_Half       hash_section_index{ 0 }; ///< Index of the hash section
+    const section* hash_section{ nullptr }; ///< Pointer to the hash section
 };
 
 typedef symbol_section_accessor_template<section> symbol_section_accessor;
