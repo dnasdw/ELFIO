@@ -51,7 +51,7 @@ using namespace ELFIO;
 
 void overwrite_data(const std::string &filename, long offset, std::string &str)
 {
-    std::ofstream file(filename, std::ios::in | std::ios::out | std::ios::binary);
+    std::ofstream file(filename.c_str(), std::ios::in | std::ios::out | std::ios::binary);
     if (!file)
         throw "Error opening file" + filename;
     std::string data(str.length(), '-');
@@ -65,7 +65,7 @@ void process_string_table(const section *s, const std::string &filename)
     int index = 1;
     while (index < s->get_size())
     {
-        auto str = std::string(s->get_data() + index);
+        std::string str = std::string(s->get_data() + index);
         // For the example purpose, we rename main function name only
         if (str == "main")
             overwrite_data(filename, s->get_offset() + index, str);
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
             return 1;
         }
 
-        for (auto section = reader.sections.begin(); section != reader.sections.end(); ++section)
+        for (std::vector<section*>::iterator section = reader.sections.begin(); section != reader.sections.end(); ++section)
         {
             if ((*section)->get_type() == SHT_STRTAB &&
                 std::string((*section)->get_name()) == std::string(".strtab"))
