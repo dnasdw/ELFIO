@@ -31,6 +31,24 @@ class symbol_section_accessor_template
 {
   public:
 //------------------------------------------------------------------------------
+    struct symbol_callback
+    {
+        virtual ~symbol_callback() {}
+
+        virtual void operator()(Elf_Xword first, Elf_Xword second)
+        {
+            first;
+            second;
+        }
+
+        static symbol_callback& default_callback()
+        {
+            static symbol_callback callback;
+            return callback;
+        }
+    };
+
+//------------------------------------------------------------------------------
     symbol_section_accessor_template( const elfio& elf_file_, S* symbol_section_ ) :
                                       elf_file( elf_file_ ),
                                       symbol_section( symbol_section_ )
@@ -214,7 +232,7 @@ class symbol_section_accessor_template
 
 //------------------------------------------------------------------------------
     Elf_Xword
-    arrange_local_symbols(std::function<void(Elf_Xword first, Elf_Xword second)> func = nullptr)
+    arrange_local_symbols(symbol_callback& func = symbol_callback::default_callback())
     {
         int nRet = 0;
 
@@ -379,7 +397,7 @@ class symbol_section_accessor_template
     //------------------------------------------------------------------------------
     template <class T>
     Elf_Xword
-    generic_arrange_local_symbols(std::function<void (Elf_Xword first, Elf_Xword second)> func)
+    generic_arrange_local_symbols(symbol_callback& func)
     {
         const endianess_convertor &convertor = elf_file.get_convertor();
         const Elf_Xword           size       = symbol_section->get_entry_size();
@@ -412,8 +430,7 @@ class symbol_section_accessor_template
 
             if (first_not_local < count && current < count)
             {
-                if (func)
-                    func(first_not_local, current);
+                func(first_not_local, current);
 
                 // Swap the symbols
                 T tmp;
