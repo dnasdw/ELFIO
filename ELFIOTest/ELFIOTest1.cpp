@@ -3,6 +3,7 @@
 #define ELFIO_NO_INTTYPES
 #endif
 
+#define BOOST_TEST_NO_LIB
 #include <boost/test/unit_test.hpp>
 #include <boost/test/output_test_stream.hpp>
 using boost::test_tools::output_test_stream;
