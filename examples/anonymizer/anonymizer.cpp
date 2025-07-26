@@ -65,7 +65,7 @@ void process_string_table(const section *s, const std::string &filename)
     int index = 1;
     while (index < s->get_size())
     {
-        auto str = std::string(s->get_data() + index);
+        std::string str = std::string(s->get_data() + index);
         // For the example purpose, we rename main function name only
         if (str == "main")
             overwrite_data(filename, s->get_offset() + index, str);
