@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE( write_exe_i386_32 )
     const std::string reference_file ( "../elf_examples/write_exe_i386_32_match" );
     BOOST_CHECK_EQUAL( true, write_exe_i386( generated_file, false ) );
     output_test_stream output( reference_file, true, false );
-    std::ifstream input( generated_file, std::ios::binary );
+    std::ifstream input( generated_file.c_str(), std::ios::binary );
     output << input.rdbuf();
     BOOST_CHECK_MESSAGE( output.match_pattern(), "Comparing " + generated_file + " and " + reference_file );
 }
