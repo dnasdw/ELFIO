@@ -92,8 +92,8 @@ class string_section_accessor_template
     S* string_section;
 };
 
-using string_section_accessor = string_section_accessor_template<section>;
-using const_string_section_accessor = string_section_accessor_template<const section>;
+typedef string_section_accessor_template<section> string_section_accessor;
+typedef string_section_accessor_template<const section> const_string_section_accessor;
 
 } // namespace ELFIO
 

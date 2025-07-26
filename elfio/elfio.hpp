@@ -854,12 +854,12 @@ class elfio
 
 //------------------------------------------------------------------------------
         std::vector<section*>::const_iterator begin() const {
-            return parent->sections_.cbegin();
+            return parent->sections_.begin();
         }
 
 //------------------------------------------------------------------------------
         std::vector<section*>::const_iterator end() const {
-            return parent->sections_.cend();
+            return parent->sections_.end();
         }
 
 //------------------------------------------------------------------------------
@@ -909,12 +909,12 @@ class elfio
 
 //------------------------------------------------------------------------------
         std::vector<segment*>::const_iterator begin() const {
-            return parent->segments_.cbegin();
+            return parent->segments_.begin();
         }
 
 //------------------------------------------------------------------------------
         std::vector<segment*>::const_iterator end() const {
-            return parent->segments_.cend();
+            return parent->segments_.end();
         }
 
 //------------------------------------------------------------------------------

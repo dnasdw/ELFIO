@@ -274,8 +274,8 @@ class symbol_section_accessor_template
     const section* hash_section;
 };
 
-using symbol_section_accessor = symbol_section_accessor_template<section>;
-using const_symbol_section_accessor = symbol_section_accessor_template<const section>;
+typedef symbol_section_accessor_template<section> symbol_section_accessor;
+typedef symbol_section_accessor_template<const section> const_symbol_section_accessor;
 
 } // namespace ELFIO
 

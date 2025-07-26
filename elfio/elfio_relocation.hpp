@@ -365,8 +365,8 @@ class relocation_section_accessor_template
     S*           relocation_section;
 };
 
-using relocation_section_accessor = relocation_section_accessor_template<section>;
-using const_relocation_section_accessor = relocation_section_accessor_template<const section>;
+typedef relocation_section_accessor_template<section> relocation_section_accessor;
+typedef relocation_section_accessor_template<const section> const_relocation_section_accessor;
 
 } // namespace ELFIO
 
