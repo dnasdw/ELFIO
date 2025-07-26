@@ -719,6 +719,33 @@ BOOST_AUTO_TEST_CASE(rearrange_local_symbols)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+struct relocation_symbol_callback : symbol_section_accessor::symbol_callback
+{
+    relocation_section_accessor& rela;
+
+    explicit relocation_symbol_callback(relocation_section_accessor& rela)
+        : rela(rela)
+    {
+    }
+
+    void operator()(Elf_Xword first, Elf_Xword second)
+    {
+        Elf64_Addr offset;
+        Elf_Word   symbol;
+        Elf_Word   rtype;
+        Elf_Sxword addend;
+        for (Elf_Word i = 0; i < rela.get_entries_num(); i++) {
+            rela.get_entry(i, offset, symbol, rtype, addend);
+            if (symbol == first) {
+                rela.set_entry(i, offset, second, rtype, addend);
+            }
+            if (symbol == second) {
+                rela.set_entry(i, offset, first, rtype, addend);
+            }
+        }
+    }
+};
+
 BOOST_AUTO_TEST_CASE(rearrange_local_symbols_with_reallocation)
 {
     std::string name              = "";
@@ -827,21 +854,8 @@ BOOST_AUTO_TEST_CASE(rearrange_local_symbols_with_reallocation)
         before.push_back(name);
     }
 
-    symbols.arrange_local_symbols([&](Elf_Xword first, Elf_Xword second) -> void {
-        Elf64_Addr offset;
-        Elf_Word   symbol;
-        Elf_Word   rtype;
-        Elf_Sxword addend;
-        for (Elf_Word i = 0; i < rela.get_entries_num(); i++) {
-            rela.get_entry(i,  offset, symbol, rtype, addend);
-            if (symbol == first) {
-                rela.set_entry(i, offset, second, rtype, addend);
-            }
-            if (symbol == second) {
-                rela.set_entry(i, offset, first, rtype, addend);
-            }
-        }
-    });
+    relocation_symbol_callback relocation_callback(rela);
+    symbols.arrange_local_symbols(relocation_callback);
 
     BOOST_REQUIRE_EQUAL(writer.save(file_name), true);
 
@@ -850,11 +864,11 @@ BOOST_AUTO_TEST_CASE(rearrange_local_symbols_with_reallocation)
     elfio reader;
     BOOST_REQUIRE_EQUAL(reader.load(file_name), true);
 
-    auto prelsec = reader.sections[".rel.text"];
-    auto psyms   = reader.sections[".symtab"];
+    section* prelsec = reader.sections[".rel.text"];
+    section* psyms   = reader.sections[".symtab"];
 
-    BOOST_REQUIRE_NE(prelsec, nullptr);
-    BOOST_REQUIRE_NE(psyms, nullptr);
+    BOOST_REQUIRE_NE(prelsec, (section*)0);
+    BOOST_REQUIRE_NE(psyms, (section*)0);
 
     const_relocation_section_accessor rel(reader, prelsec);
     const_symbol_section_accessor syms(reader, psyms);
