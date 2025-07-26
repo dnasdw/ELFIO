@@ -390,8 +390,8 @@ class symbol_section_accessor_template
 
         while (true)
         {
-            T *p1 = nullptr;
-            T *p2 = nullptr;
+            T *p1 = 0;
+            T *p2 = 0;
 
             while (first_not_local < count)
             {

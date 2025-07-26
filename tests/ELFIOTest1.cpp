@@ -660,25 +660,25 @@ BOOST_AUTO_TEST_CASE(rearrange_local_symbols)
     elfio reader;
     BOOST_REQUIRE_EQUAL(reader.load(file_name), true);
 
-    auto psymsec = reader.sections[".symtab"];
-    BOOST_REQUIRE_NE(psymsec, nullptr);
+    section* psymsec = reader.sections[".symtab"];
+    BOOST_REQUIRE_NE(psymsec, (section*)0);
 
     const_symbol_section_accessor rsymbols(reader, psymsec);
 
-    auto bound = psymsec->get_info();
-    auto num   = rsymbols.get_symbols_num();
+    Elf_Word bound = psymsec->get_info();
+    Elf_Xword num  = rsymbols.get_symbols_num();
 
     BOOST_CHECK_LE(bound, num);
 
     // Check that all symbols are LOCAL until the bound value
-    for (auto i = 0; i < bound; i++)
+    for (Elf_Word i = 0; i < bound; i++)
     {
         rsymbols.get_symbol(i, name, value, size, bind, type, section_index, other);
         BOOST_CHECK_EQUAL(bind, STB_LOCAL);
     }
 
     // Check that all symbols are not LOCAL after the bound value
-    for (auto i = bound; i < num; i++)
+    for (Elf_Word i = bound; i < num; i++)
     {
         rsymbols.get_symbol(i, name, value, size, bind, type, section_index, other);
 
