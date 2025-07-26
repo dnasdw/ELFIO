@@ -130,13 +130,11 @@ class symbol_section_accessor_template
         Elf64_Addr v = 0;
 
         if ( elf_file.get_class() == ELFCLASS32 ) {
-            match = generic_search_symbols<Elf32_Sym>([&convertor, &value](const Elf32_Sym* sym) {
-                    return convertor(sym->st_value) == value;
-                }, idx);
+            match = generic_search_symbols<Elf32_Sym>(
+                symbol_matcher<Elf32_Sym>(convertor, value), idx);
         } else {
-            match = generic_search_symbols<Elf64_Sym>([&convertor, &value](const Elf64_Sym* sym) {
-                    return convertor(sym->st_value) == value;
-                }, idx);
+            match = generic_search_symbols<Elf64_Sym>(
+                symbol_matcher<Elf64_Sym>(convertor, value), idx);
         }
 
         if (match) {
@@ -211,6 +209,24 @@ class symbol_section_accessor_template
 //------------------------------------------------------------------------------
   private:
 //------------------------------------------------------------------------------
+    template <class T> struct symbol_matcher
+    {
+        const endianess_convertor& convertor;
+        Elf64_Addr                 value;
+
+        explicit symbol_matcher( const endianess_convertor& convertor,
+                                 Elf64_Addr                 value )
+            : convertor( convertor ), value( value )
+        {
+        }
+
+        bool operator()( const T* sym ) const
+        {
+            return convertor( sym->st_value ) == value;
+        }
+    };
+
+//------------------------------------------------------------------------------
     void
     find_hash_section()
     {
@@ -256,9 +272,9 @@ class symbol_section_accessor_template
     }
 
 //------------------------------------------------------------------------------
-    template< class T >
+    template< class T, class M >
     bool
-    generic_search_symbols(std::function<bool(const T*)> match, Elf_Xword& idx) const {
+    generic_search_symbols(M match, Elf_Xword& idx) const {
         for (Elf_Xword i = 0; i < get_symbols_num(); i++){
             const T* symPtr = generic_get_symbol_ptr<T>(i);
 
