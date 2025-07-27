@@ -153,36 +153,47 @@ int main( int argc, char* argv[] )
     //-----------------------------------------------------------------------------
     // note
     //-----------------------------------------------------------------------------
-    psection       = elfio_get_section_by_name( pelfio, ".note.gnu.build-id" );
-    pnote_t pnote  = elfio_note_section_accessor_new( pelfio, psection );
-    int     noteno = elfio_note_get_notes_num( pnote );
-    for ( int i = 0; i < noteno; i++ ) {
-        Elf_Word type;
-        char     name[128];
-        int      name_len = 128;
-        char*    desc;
-        Elf_Word descSize = 128;
-        elfio_note_get_note( pnote, i, &type, name, name_len, (void**)&desc,
-                             &descSize );
-        // printf( "[%4d] %s %08x\n", i, name, descSize );
+    {
+        psection_t psection =
+            elfio_get_section_by_name( pelfio, ".note.gnu.build-id" );
+        pnote_t pnote  = elfio_note_section_accessor_new( pelfio, psection );
+        int     noteno = elfio_note_get_notes_num( pnote );
+        {
+            int i;
+            for ( i = 0; i < noteno; i++ ) {
+                Elf_Word type;
+                char     name[128];
+                int      name_len = 128;
+                char*    desc;
+                Elf_Word descSize = 128;
+                elfio_note_get_note( pnote, i, &type, name, name_len,
+                                     (void**)&desc, &descSize );
+                // printf( "[%4d] %s %08x\n", i, name, descSize );
+            }
+        }
+        elfio_note_section_accessor_delete( pnote );
     }
-    elfio_note_section_accessor_delete( pnote );
 
     //-----------------------------------------------------------------------------
     // dynamic
     //-----------------------------------------------------------------------------
-    psection = elfio_get_section_by_name( pelfio, ".dynamic" );
-    pdynamic_t pdynamic =
-        elfio_dynamic_section_accessor_new( pelfio, psection );
-    int dynno = elfio_dynamic_get_entries_num( pdynamic );
-    for ( int i = 0; i < dynno; i++ ) {
-        Elf_Xword tag;
-        Elf_Xword value;
-        char      str[128];
-        elfio_dynamic_get_entry( pdynamic, i, &tag, &value, str, 128 );
-        printf( "[%4d] %16lx %16lx %s\n", i, tag, value, str );
+    {
+        psection_t psection = elfio_get_section_by_name( pelfio, ".dynamic" );
+        pdynamic_t pdynamic =
+            elfio_dynamic_section_accessor_new( pelfio, psection );
+        int dynno = elfio_dynamic_get_entries_num( pdynamic );
+        {
+            int i;
+            for ( i = 0; i < dynno; i++ ) {
+                Elf_Xword tag;
+                Elf_Xword value;
+                char      str[128];
+                elfio_dynamic_get_entry( pdynamic, i, &tag, &value, str, 128 );
+                printf( "[%4d] %16lx %16lx %s\n", i, tag, value, str );
+            }
+        }
+        elfio_dynamic_section_accessor_delete( pdynamic );
     }
-    elfio_dynamic_section_accessor_delete( pdynamic );
 
     elfio_delete( pelfio );
 
