@@ -92,34 +92,41 @@ int main( int argc, char* argv[] )
     //------------------------NoA-----------------------------------------------------
     // relocation
     //-----------------------------------------------------------------------------
-    psection = elfio_get_section_by_name( pelfio, ".rela.dyn" );
-    prelocation_t preloc =
-        elfio_relocation_section_accessor_new( pelfio, psection );
-    int relno = elfio_relocation_get_entries_num( preloc );
-    for ( int i = 0; i < relno; i++ ) {
-        Elf64_Addr offset;
-        Elf_Word   symbol;
-        Elf_Word   type;
-        Elf_Sxword addend;
-        elfio_relocation_get_entry( preloc, i, &offset, &symbol, &type,
-                                    &addend );
-        // printf( "[%4d] %16lx, %08x %08x %16lx\n", i, offset, symbol, type, addend );
+    {
+        psection_t psection = elfio_get_section_by_name( pelfio, ".rela.dyn" );
+        prelocation_t preloc =
+            elfio_relocation_section_accessor_new( pelfio, psection );
+        int relno = elfio_relocation_get_entries_num( preloc );
+        {
+            int i;
+            for ( i = 0; i < relno; i++ ) {
+                Elf64_Addr offset;
+                Elf_Word   symbol;
+                Elf_Word   type;
+                Elf_Sxword addend;
+                elfio_relocation_get_entry( preloc, i, &offset, &symbol, &type,
+                                            &addend );
+                // printf( "[%4d] %16lx, %08x %08x %16lx\n", i, offset, symbol, type, addend );
+            }
+        }
+        elfio_relocation_section_accessor_delete( preloc );
     }
-    elfio_relocation_section_accessor_delete( preloc );
 
     //-----------------------------------------------------------------------------
     // string
     //-----------------------------------------------------------------------------
-    psection            = elfio_get_section_by_name( pelfio, ".strtab" );
-    pstring_t   pstring = elfio_string_section_accessor_new( psection );
-    int         pos     = 0;
-    const char* str     = elfio_string_get_string( pstring, pos );
-    while ( str ) {
-        pos += strlen( str ) + 1;
-        str = elfio_string_get_string( pstring, pos );
-        // printf( "%s\n", str );
+    {
+        psection_t  psection = elfio_get_section_by_name( pelfio, ".strtab" );
+        pstring_t   pstring  = elfio_string_section_accessor_new( psection );
+        int         pos      = 0;
+        const char* str      = elfio_string_get_string( pstring, pos );
+        while ( str ) {
+            pos += strlen( str ) + 1;
+            str = elfio_string_get_string( pstring, pos );
+            // printf( "%s\n", str );
+        }
+        elfio_string_section_accessor_new( pstring );
     }
-    elfio_string_section_accessor_new( pstring );
 
     elfio_delete( pelfio );
 
