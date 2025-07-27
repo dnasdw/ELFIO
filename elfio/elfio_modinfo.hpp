@@ -58,7 +58,9 @@ template <class S> class modinfo_section_accessor_template
     //------------------------------------------------------------------------------
     bool get_attribute( std::string field_name, std::string& value ) const
     {
-        for ( auto i = content.begin(); i != content.end(); i++ ) {
+        for ( std::vector<std::pair<std::string, std::string>>::const_iterator
+                  i = content.begin();
+              i != content.end(); i++ ) {
             if ( field_name == i->first ) {
                 value = i->second;
                 return true;
@@ -117,9 +119,9 @@ template <class S> class modinfo_section_accessor_template
     std::vector<std::pair<std::string, std::string>> content;
 };
 
-using modinfo_section_accessor = modinfo_section_accessor_template<section>;
-using const_modinfo_section_accessor =
-    modinfo_section_accessor_template<const section>;
+typedef modinfo_section_accessor_template<section> modinfo_section_accessor;
+typedef modinfo_section_accessor_template<const section>
+    const_modinfo_section_accessor;
 
 } // namespace ELFIO
 

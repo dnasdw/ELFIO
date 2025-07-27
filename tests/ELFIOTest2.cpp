@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE( modinfo_read )
                        { "name", "zavl" },
                        { "vermagic", "5.4.0-42-generic SMP mod_unload " } };
 
-    for ( auto i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
+    for ( uint32_t i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
           i++ ) {
         std::string field;
         std::string value;
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE( modinfo_read )
         BOOST_CHECK_EQUAL( value, attributes[i].value );
     }
 
-    for ( auto i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
+    for ( uint32_t i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
           i++ ) {
         std::string field = attributes[i].field;
         std::string value;
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( modinfo_write )
                        { "test1", "value1" },
                        { "test2", "value2" } };
 
-    for ( auto i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
+    for ( uint32_t i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
           i++ ) {
         std::string field;
         std::string value;
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE( modinfo_write )
         BOOST_CHECK_EQUAL( value, attributes[i].value );
     }
 
-    for ( auto i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
+    for ( uint32_t i = 0; i < sizeof( attributes ) / sizeof( attributes[0] );
           i++ ) {
         std::string field = attributes[i].field;
         std::string value;
