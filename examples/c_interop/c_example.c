@@ -58,22 +58,28 @@ int main( int argc, char* argv[] )
     */
 
     /*
-    psection_t psection = elfio_get_section_by_name( pelfio, ".symtab" );
-    psymbol_t  psymbols = elfio_symbol_section_accessor_new( pelfio, psection );
-    int        symno    = elfio_symbol_get_symbols_num( psymbols );
-    for ( int i = 0; i < symno; i++ ) {
-        char          name[128];
-        Elf64_Addr    value;
-        Elf_Xword     size;
-        unsigned char bind;
-        unsigned char type;
-        Elf_Half      section_index;
-        unsigned char other;
-        elfio_symbol_get_symbol( psymbols, i, name, 128, &value, &size,
-                                 &bind, &type, &section_index, &other );
-        printf( "[%4d] %10lu, %4lu %s\n", i, value, size, name );
+    {
+        psection_t psection = elfio_get_section_by_name( pelfio, ".symtab" );
+        psymbol_t  psymbols =
+            elfio_symbol_section_accessor_new( pelfio, psection );
+        int symno = elfio_symbol_get_symbols_num( psymbols );
+        {
+            int i;
+            for ( i = 0; i < symno; i++ ) {
+                char          name[128];
+                Elf64_Addr    value;
+                Elf_Xword     size;
+                unsigned char bind;
+                unsigned char type;
+                Elf_Half      section_index;
+                unsigned char other;
+                elfio_symbol_get_symbol( psymbols, i, name, 128, &value, &size,
+                                         &bind, &type, &section_index, &other );
+                printf( "[%4d] %10lu, %4lu %s\n", i, value, size, name );
+            }
+        }
+        elfio_symbol_section_accessor_delete( psymbols );
     }
-    elfio_symbol_section_accessor_delete( psymbols );
     */
 
     elfio_delete( pelfio );
