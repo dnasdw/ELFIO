@@ -16,6 +16,21 @@
 
 using namespace ELFIO;
 
+struct relocation_symbol_callback : symbol_section_accessor::symbol_callback
+{
+    relocation_section_accessor& rela;
+
+    explicit relocation_symbol_callback( relocation_section_accessor& rela )
+        : rela( rela )
+    {
+    }
+
+    void operator()( Elf_Xword first, Elf_Xword second )
+    {
+        rela.swap_symbols( first, second );
+    }
+};
+
 int main( void )
 {
     elfio writer;
@@ -106,9 +121,7 @@ int main( void )
 
     // We don't use local symbols here. There is no need to rearrange them.
     // But, for the completeness, we do this just prior 'save'
-    syma.arrange_local_symbols( [&]( Elf_Xword first, Elf_Xword second ) {
-        rela.swap_symbols( first, second );
-    } );
+    syma.arrange_local_symbols( relocation_symbol_callback( rela ) );
 
     // Create ELF object file
     writer.save( "hello.o" );
