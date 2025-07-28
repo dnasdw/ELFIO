@@ -311,11 +311,11 @@ class elfio
         for ( int h = 0; h < segments.size(); ++h ) {
             const segment* seg = segments[h];
             if ( seg->get_type() == PT_LOAD && seg->get_file_size() > 0 ) {
-                auto sec = find_prog_section_for_offset( seg->get_offset() );
+                const section* sec = find_prog_section_for_offset( seg->get_offset() );
                 if ( sec ) {
-                    auto sec_addr = get_virtual_addr( seg->get_offset(), sec );
+                    Elf64_Addr sec_addr = get_virtual_addr( seg->get_offset(), sec );
                     if ( sec_addr != seg->get_virtual_address() ) {
-                        errors += "Virtual address of segment " + std::to_string( h ) + " (" + to_hex_string( seg->get_virtual_address() ) + ")"
+                        errors += "Virtual address of segment " + to_dec_string( h ) + " (" + to_hex_string( seg->get_virtual_address() ) + ")"
                                +  " conflicts with address of section " + sec->get_name() + " (" + to_hex_string( sec_addr ) + ")"
                                +  " at offset " + to_hex_string( seg->get_offset() ) + "\n";
                     }

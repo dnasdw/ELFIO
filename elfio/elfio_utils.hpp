@@ -193,7 +193,7 @@ inline std::string to_hex_string( Elf64_Addr t )
 {
     std::string s;
     while( t ) {
-        auto d = t & 0xf;
+        int d = t & 0xf;
         if ( d < 0xa )
             s = char('0' + d) + s;
         else
