@@ -1,5 +1,5 @@
 # Unit tests are written using the Boost unit test framework
-find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost REQUIRED)
 
 # Find all the binary files used for testing and copy them into the build
 # directory. This allows the test to be run from the build directory
@@ -29,11 +29,15 @@ add_executable(
     ELFIOTest1.cpp
     ELFIOTest2.cpp)
 
+target_include_directories(
+    ELFIOTest
+    PRIVATE
+        ${Boost_INCLUDE_DIRS})
+
 target_link_libraries(
     ELFIOTest
     PRIVATE
-        elfio::elfio
-        Boost::unit_test_framework)
+        elfio::elfio)
 
 add_test(
     NAME
