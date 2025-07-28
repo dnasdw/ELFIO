@@ -102,9 +102,9 @@ template <class S> class array_section_accessor_template
     S*           array_section;
 };
 
-using array_section_accessor = array_section_accessor_template<section>;
-using const_array_section_accessor =
-    array_section_accessor_template<const section>;
+typedef array_section_accessor_template<section> array_section_accessor;
+typedef array_section_accessor_template<const section>
+    const_array_section_accessor;
 
 } // namespace ELFIO
 
