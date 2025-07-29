@@ -23,7 +23,7 @@ THE SOFTWARE.
 #ifndef ELFIO_UTILS_HPP
 #define ELFIO_UTILS_HPP
 
-#include <cstdint>
+#include <elfio/compat.hpp>
 #include <ostream>
 
 #define ELFIO_GET_ACCESS( TYPE, NAME, FIELD ) \
