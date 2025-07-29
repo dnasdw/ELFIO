@@ -41,13 +41,15 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    char msg[128];
-    ret = elfio_validate( pelfio, msg, 128 );
+    {
+        char msg[128];
+        ret = elfio_validate( pelfio, msg, 128 );
 
-    if ( !ret ) {
-        printf( "Validation errors:\n" );
-        printf( "%s\n", msg );
-        return 2;
+        if ( !ret ) {
+            printf( "Validation errors:\n" );
+            printf( "%s\n", msg );
+            return 2;
+        }
     }
 
     //-----------------------------------------------------------------------------
