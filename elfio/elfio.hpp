@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include <vector>
 #include <typeinfo>
 
+#include "compat.hpp"
 #include "elf_types.hpp"
 #include "elfio_header.hpp"
 #include "elfio_section.hpp"
