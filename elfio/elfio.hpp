@@ -78,8 +78,16 @@ class elfio
     }
 
     //------------------------------------------------------------------------------
+#if defined( _MSC_VER ) && _MSC_VER < 1800
+  private:
+    elfio( const elfio& );
+    elfio& operator=( const elfio& );
+
+  public:
+#else
     elfio( const elfio& ) = delete;
     elfio& operator=( const elfio& ) = delete;
+#endif
 
     //------------------------------------------------------------------------------
     ~elfio() { clean(); }
