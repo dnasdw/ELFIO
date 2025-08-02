@@ -89,8 +89,10 @@ class elfio
     elfio( const elfio& )            = delete;
     elfio& operator=( const elfio& ) = delete;
 #endif
+#if !( defined( _MSC_VER ) && _MSC_VER < 1900 )
     elfio( elfio&& )                 = default;
     elfio& operator=( elfio&& )      = default;
+#endif
     // clang-format on
 
     //------------------------------------------------------------------------------
