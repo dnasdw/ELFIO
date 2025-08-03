@@ -73,4 +73,51 @@ static std::nullptr_t nullptr = {};
 #endif
 #endif
 
+#if defined( _MSC_VER ) && _MSC_VER < 1600
+#define emplace_back( x ) push_back( x )
+#endif
+
+#if defined( _MSC_VER ) && _MSC_VER < 1700
+#define override
+#endif
+
+#if defined( _MSC_VER ) && _MSC_VER < 1900
+#define noexcept throw()
+#endif
+
+#if defined( _MSC_VER ) && _MSC_VER < 1600
+#if defined( __cplusplus )
+namespace std {
+template <class T> T& move( T& t ) { return t; }
+} // namespace std
+#endif
+#endif
+
+#if defined( _MSC_VER ) && _MSC_VER < 1600
+#if defined( __cplusplus )
+#include <regex>
+
+namespace std {
+using tr1::regex;
+using tr1::regex_match;
+using tr1::smatch;
+} // namespace std
+#endif
+#endif
+
+#if defined( _MSC_VER ) && _MSC_VER < 1800
+#include <stdlib.h>
+
+#if defined( __cplusplus )
+namespace std {
+#endif
+static uint64_t strtoull( const char* str, char** str_end, int base )
+{
+    return _strtoui64( str, str_end, base );
+}
+#if defined( __cplusplus )
+} // namespace std
+#endif
+#endif
+
 #endif // ELFIO_COMPAT_HPP
