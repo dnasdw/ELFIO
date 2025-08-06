@@ -82,7 +82,7 @@ template <class S> class modinfo_section_accessor_template
             std::string attribute = field + "=" + value;
 
             modinfo_section->append_data( attribute + '\0' );
-            content.emplace_back( field, value );
+            content.emplace_back( make_pair( field, value ) );
         }
 
         return current_position;
@@ -101,8 +101,8 @@ template <class S> class modinfo_section_accessor_template
                 if ( i < modinfo_section->get_size() ) {
                     std::string info = pdata + i;
                     size_t      loc  = info.find( '=' );
-                    content.emplace_back( info.substr( 0, loc ),
-                                          info.substr( loc + 1 ) );
+                    content.emplace_back( make_pair( info.substr( 0, loc ),
+                                                     info.substr( loc + 1 ) ) );
 
                     i += info.length();
                 }

@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include <algorithm>
 #include <vector>
 #include <deque>
+#include <iterator>
 
 #include <elfio/compat.hpp>
 #include <elfio/elf_types.hpp>
@@ -342,7 +343,9 @@ class elfio
     //------------------------------------------------------------------------------
     const section* find_prog_section_for_offset( Elf64_Off offset ) const
     {
-        for ( auto sec : sections ) {
+        for ( std::vector<section*>::const_iterator it = sections.begin();
+              it != sections.end(); ++it ) {
+            section* sec = *it;
             if ( sec->get_type() == SHT_PROGBITS &&
                  is_offset_in_section( offset, sec ) )
                 return sec;
@@ -356,13 +359,15 @@ class elfio
         delete header;
         header = 0;
 
-        for ( auto it : sections_ ) {
-            delete it;
+        for ( std::vector<section*>::iterator it = sections_.begin();
+              it != sections_.end(); ++it ) {
+            delete *it;
         }
         sections_.clear();
 
-        for ( auto it : segments_ ) {
-            delete it;
+        for ( std::vector<segment*>::iterator it = segments_.begin();
+              it != segments_.end(); ++it ) {
+            delete *it;
         }
         segments_.clear();
     }
@@ -528,7 +533,9 @@ class elfio
             Elf64_Off segEndOffset  = segBaseOffset + seg->get_file_size();
             Elf64_Off segVBaseAddr  = seg->get_virtual_address();
             Elf64_Off segVEndAddr   = segVBaseAddr + seg->get_memory_size();
-            for ( auto psec : sections ) {
+            for ( std::vector<section*>::iterator it = sections.begin();
+                  it != sections.end(); ++it ) {
+                section* psec = *it;
                 // SHF_ALLOC sections are matched based on the virtual address
                 // otherwise the file offset is matched
                 if ( ( psec->get_flags() & SHF_ALLOC )
@@ -556,7 +563,9 @@ class elfio
     //------------------------------------------------------------------------------
     bool save_sections( std::ostream& stream )
     {
-        for ( auto sec : sections_ ) {
+        for ( std::vector<section*>::iterator it = sections_.begin();
+              it != sections_.end(); ++it ) {
+            section*       sec = *it;
             std::streampos headerPosition =
                 (std::streamoff)header->get_sections_offset() +
                 (std::streampos)header->get_section_entry_size() *
@@ -570,7 +579,9 @@ class elfio
     //------------------------------------------------------------------------------
     bool save_segments( std::ostream& stream )
     {
-        for ( auto seg : segments_ ) {
+        for ( std::vector<segment*>::iterator it = segments_.begin();
+              it != segments_.end(); ++it ) {
+            segment*       seg = *it;
             std::streampos headerPosition =
                 header->get_segments_offset() +
                 (std::streampos)header->get_segment_entry_size() *
@@ -685,7 +696,9 @@ class elfio
     //------------------------------------------------------------------------------
     void calc_segment_alignment()
     {
-        for ( auto seg : segments_ ) {
+        for ( std::vector<segment*>::iterator it = segments_.begin();
+              it != segments_.end(); ++it ) {
+            segment* seg = *it;
             for ( int i = 0; i < seg->get_sections_num(); ++i ) {
                 section* sect = sections_[seg->get_section_index_at( i )];
                 if ( sect->get_addr_align() > seg->get_align() ) {
@@ -705,7 +718,7 @@ class elfio
         // sub sequence of other segments are located at the end
         worklist = get_ordered_segments();
 
-        for ( auto i = 0; i < worklist.size(); ++i ) {
+        for ( size_t i = 0; i < worklist.size(); ++i ) {
             Elf_Xword segment_memory   = 0;
             Elf_Xword segment_filesize = 0;
             Elf_Xword seg_start_pos    = current_file_pos;
@@ -745,7 +758,7 @@ class elfio
             }
 
             // Write segment's data
-            for ( auto j = 0; j < seg->get_sections_num(); ++j ) {
+            for ( int j = 0; j < seg->get_sections_num(); ++j ) {
                 Elf_Half index = seg->get_section_index_at( j );
 
                 section* sec = sections[index];
@@ -878,9 +891,11 @@ class elfio
         {
             section* sec = 0;
 
-            for ( auto it : parent->sections_ ) {
-                if ( it->get_name() == name ) {
-                    sec = it;
+            for ( std::vector<section*>::iterator it =
+                      parent->sections_.begin();
+                  it != parent->sections_.end(); ++it ) {
+                if ( ( *it )->get_name() == name ) {
+                    sec = *it;
                     break;
                 }
             }
