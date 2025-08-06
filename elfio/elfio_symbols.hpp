@@ -378,11 +378,11 @@ template <class S> class symbol_section_accessor_template
 
         if ( ( convertor( bloom_filter[bloom_index] ) & bloom_bits ) ==
              bloom_bits ) {
-            uint32_t bucket = hash % nbuckets;
-            auto*    buckets =
+            uint32_t  bucket = hash % nbuckets;
+            uint32_t* buckets =
                 (uint32_t*)( hash_section->get_data() + 4 * sizeof( uint32_t ) +
                              bloom_size * sizeof( T ) );
-            auto* chains =
+            uint32_t* chains =
                 (uint32_t*)( hash_section->get_data() + 4 * sizeof( uint32_t ) +
                              bloom_size * sizeof( T ) +
                              nbuckets * sizeof( uint32_t ) );
