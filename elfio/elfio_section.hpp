@@ -34,7 +34,7 @@ class section
     friend class elfio;
 
   public:
-    virtual ~section() = default;
+    virtual ~section() {}
 
     ELFIO_GET_ACCESS_DECL( Elf_Half, index );
     ELFIO_GET_SET_ACCESS_DECL( std::string, name );

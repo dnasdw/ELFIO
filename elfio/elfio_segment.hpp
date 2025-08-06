@@ -34,7 +34,7 @@ class segment
     friend class elfio;
 
   public:
-    virtual ~segment() = default;
+    virtual ~segment() {}
 
     ELFIO_GET_ACCESS_DECL( Elf_Half, index );
     ELFIO_GET_SET_ACCESS_DECL( Elf_Word, type );
