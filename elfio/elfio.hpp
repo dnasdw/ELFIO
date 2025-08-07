@@ -77,6 +77,37 @@ class elfio
         create( ELFCLASS32, ELFDATA2LSB );
     }
 
+#if defined( _MSC_VER ) && _MSC_VER < 1600
+    void compat_move( elfio& other )
+    {
+        std::swap( header, other.header );
+        std::swap( sections_, other.sections_ );
+        std::swap( segments_, other.segments_ );
+        std::swap( convertor, other.convertor );
+        std::swap( current_file_pos, other.current_file_pos );
+
+        other.header = nullptr;
+        other.sections_.clear();
+        other.segments_.clear();
+    }
+
+    elfio( const elfio& other )
+        : sections( this ), segments( this ), header( nullptr ),
+          current_file_pos( 0 )
+    {
+        compat_move( const_cast<elfio&>( other ) );
+    }
+
+    elfio& operator=( const elfio& other )
+    {
+        if ( this != &other ) {
+            clean();
+
+            compat_move( const_cast<elfio&>( other ) );
+        }
+        return *this;
+    }
+#else
     elfio( elfio&& other ) noexcept : sections( this ), segments( this )
     {
         header           = std::move(other.header);
@@ -107,15 +138,18 @@ class elfio
         }
         return *this;
     }
+#endif
 
     //------------------------------------------------------------------------------
     // clang-format off
 #if defined( _MSC_VER ) && _MSC_VER < 1800
+#if _MSC_VER >= 1600
   private:
     elfio( const elfio& );
     elfio& operator=( const elfio& );
 
   public:
+#endif
 #else
     elfio( const elfio& )            = delete;
     elfio& operator=( const elfio& ) = delete;
