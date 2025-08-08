@@ -314,12 +314,12 @@ constexpr Elf_Half EM_WEBASSEMBLY       = 0x4157; // "Web Assembly";
 constexpr Elf_Half EM_DLX               = 0x5aa5; // "OpenDLX";
 constexpr Elf_Half EM_XSTORMY16         = 0xad45; // "Sanyo XStormy16 CPU core";
 constexpr Elf_Half EM_IQ2000            = 0xFEBA; // "Vitesse IQ2000";
-constexpr Elf_Half EM_M32C_OLD          = 0xFEB;
+constexpr Elf_Half EM_M32C_OLD          = 0xFEB0;
 constexpr Elf_Half EM_NIOS32            = 0xFEBB; // "Altera Nios";
 constexpr Elf_Half EM_CYGNUS_MEP        = 0xF00D; // "Toshiba MeP Media Engine";
 constexpr Elf_Half EM_ADAPTEVA_EPIPHANY = 0x1223; // "Adapteva EPIPHANY";
 constexpr Elf_Half EM_CYGNUS_FRV        = 0x5441; // "Fujitsu FR-V";
-constexpr Elf_Half    EM_S12Z           = 0x4DEF; // "Freescale S12Z";
+constexpr Elf_Half EM_S12Z              = 0x4DEF; // "Freescale S12Z";
 // clang-format on
 
 // File version

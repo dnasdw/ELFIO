@@ -140,10 +140,10 @@ int main( int argc, char* argv[] )
         {
             int i;
             for ( i = 0; i < relno; i++ ) {
-                Elf64_Addr offset;
-                Elf_Word   symbol;
-                Elf_Word   type;
-                Elf_Sxword addend;
+                Elf64_Addr    offset;
+                Elf_Word      symbol;
+                unsigned char type;
+                Elf_Sxword    addend;
                 elfio_relocation_get_entry( preloc, i, &offset, &symbol, &type,
                                             &addend );
                 // printf( "[%4d] %16lx, %08x %08x %16lx\n", i, offset, symbol, type, addend );
