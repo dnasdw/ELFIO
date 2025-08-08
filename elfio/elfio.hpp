@@ -84,6 +84,7 @@ class elfio
         std::swap( sections_, other.sections_ );
         std::swap( segments_, other.segments_ );
         std::swap( convertor, other.convertor );
+        std::swap( addr_translator, other.addr_translator );
         std::swap( current_file_pos, other.current_file_pos );
 
         other.header = nullptr;
