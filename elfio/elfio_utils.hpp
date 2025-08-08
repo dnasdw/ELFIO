@@ -187,7 +187,10 @@ class address_translator
             return value;
         }
 
-        for ( auto& t : translation ) {
+        for ( std::vector<address_translation>::const_iterator it =
+                  translation.begin();
+              it != translation.end(); ++it ) {
+            const address_translation& t = *it;
             if ( t.map_to <= value &&
                  ( ( value - t.map_to ) < ( t.end - t.start ) ) ) {
                 std::cout << std::hex << t.start - t.map_to + value << std::endl;

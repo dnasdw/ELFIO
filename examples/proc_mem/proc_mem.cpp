@@ -30,16 +30,25 @@ THE SOFTWARE.
 
 using namespace ELFIO;
 
+struct address_translation_map_to_less
+{
+    bool operator()( const address_translation& a,
+                     const address_translation& b ) const
+    {
+        return a.map_to < b.map_to;
+    }
+};
+
 void get_translation_ranges( std::ifstream&                    proc_maps,
                              const std::string&                file_name,
                              std::vector<address_translation>& result )
 {
     result.clear();
 
-    const std::regex rexpr(
-        "([0-9A-Fa-f]+)-([0-9A-Fa-f]+) ([-r]...) ([0-9A-Fa-f]+) (.....) "
-        "([0-9]+)([[:blank:]]*)([[:graph:]]*)" );
-    std::smatch match;
+    const std::regex rexpr( "([0-9A-Fa-f]+)-([0-9A-Fa-f]+) ([-r]...) "
+                            "([0-9A-Fa-f]+) ([0-9A-Fa-f]+:[0-9A-Fa-f]+) "
+                            "([0-9]+)([[:blank:]]*)([[:graph:]]*)" );
+    std::smatch      match;
     while ( proc_maps ) {
         std::string line;
         std::getline( proc_maps, line );
@@ -47,17 +56,15 @@ void get_translation_ranges( std::ifstream&                    proc_maps,
         if ( std::regex_match( line, match, rexpr ) ) {
             if ( match.size() == 9 && match[8].str() == file_name ) {
                 result.emplace_back( address_translation(
-                    std::stoul( match[1].str(), 0, 16 ),
-                    std::stoul( match[2].str(), 0, 16 ),
-                    std::stoul( match[4].str(), 0, 16 ) ) );
+                    std::strtoull( match[1].str().c_str(), 0, 16 ),
+                    std::strtoull( match[2].str().c_str(), 0, 16 ),
+                    std::strtoull( match[4].str().c_str(), 0, 16 ) ) );
             }
         }
     }
 
     std::sort( result.begin(), result.end(),
-               []( address_translation& a, address_translation& b ) -> bool {
-                   return a.map_to < b.map_to;
-               } );
+               address_translation_map_to_less() );
 }
 
 int main( int argc, char** argv )
@@ -68,7 +75,8 @@ int main( int argc, char** argv )
     }
 
     // Process file translation regions for the ELF file from /proc/pid/maps
-    std::ifstream proc_maps( std::string( "/proc/" ) + argv[1] + "/maps" );
+    std::ifstream proc_maps(
+        ( std::string( "/proc/" ) + argv[1] + "/maps" ).c_str() );
     if ( !proc_maps ) {
         std::cout << "Can't open "
                   << std::string( "/proc/" ) + argv[1] + "/maps"
@@ -78,7 +86,9 @@ int main( int argc, char** argv )
 
     std::vector<address_translation> ranges;
     get_translation_ranges( proc_maps, argv[2], ranges );
-    // for ( auto& range : ranges ) {
+    // for ( std::vector<address_translation>::iterator it = ranges.begin();
+    //       it != ranges.end(); ++it ) {
+    //     address_translation& range = *it;
     //     std::cout << std::hex << range.start << " " << range.end << " "
     //               << range.map_to << std::endl;
     // }
