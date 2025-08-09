@@ -166,7 +166,7 @@ template <class T> class segment_impl : public segment
             set_stream_size( stream.tellg() );
         }
         else {
-            set_stream_size( std::numeric_limits<size_t>::max() );
+            set_stream_size( ~static_cast<size_t>( 0 ) );
         }
 
         stream.seekg( ( *translator )[header_offset] );

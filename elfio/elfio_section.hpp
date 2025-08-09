@@ -197,7 +197,7 @@ template <class T> class section_impl : public section
             set_stream_size( stream.tellg() );
         }
         else {
-            set_stream_size( std::numeric_limits<size_t>::max() );
+            set_stream_size( ~static_cast<size_t>( 0 ) );
         }
 
         stream.seekg( ( *translator )[header_offset] );
