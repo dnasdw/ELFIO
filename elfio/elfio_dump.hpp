@@ -479,146 +479,177 @@ static const struct dynamic_tag_t
 };
 
 // clang-format off
-static const struct note_tag_t
+struct note_tag_t
 {
     struct note_values_t
     {
         Elf64_Word  type;
         std::string type_str;
         std::string description;
+
+        note_values_t( Elf64_Word         t,
+                       const std::string& ts,
+                       const std::string& desc )
+            : type( t ), type_str( ts ), description( desc )
+        {
+        }
     };
     std::string                name;
     std::vector<note_values_t> values;
-} note_tag_table[] = {
-    { "",
-      { { NT_PRSTATUS,     "NT_PRSTATUS",     "prstatus struct" },
-        { NT_FPREGSET,     "NT_FPREGSET",     "fpregset struct" },
-        { NT_PRPSINFO,     "NT_PRPSINFO",     "prpsinfo struct" },
-        { NT_TASKSTRUCT,   "NT_TASKSTRUCT",   "task struct" },
-        { NT_AUXV,         "NT_AUXV",         "Elfxx_auxv_t" },
-        { NT_PSTATUS,      "NT_PSTATUS",      "pstatus struct" },
-        { NT_FPREGS,       "NT_FPREGS",       "fpregset struct" },
-        { NT_PSINFO,       "NT_PSINFO",       "psinfo struct" },
-        { NT_LWPSTATUS,    "NT_LWPSTATUS",    "lwpstatus_t struct" },
-        { NT_LWPSINFO,     "NT_LWPSINFO",     "lwpsinfo_t struct" },
-        { NT_WIN32PSTATUS, "NT_WIN32PSTATUS", "win32_pstatus struct" },
-      } },
-    { "LINUX",
-      { { NT_PRXFPREG,             "NT_PRXFPREG", "Contains a user_xfpregs_struct;" },
-        { NT_PPC_VMX,              "NT_PPC_VMX", "PowerPC Altivec/VMX registers" },
-        { NT_PPC_VSX,              "NT_PPC_VSX", "PowerPC VSX registers" },
-        { NT_PPC_TAR,              "NT_PPC_TAR", "PowerPC Target Address Register" },
-        { NT_PPC_PPR,              "NT_PPC_PPR", "PowerPC Program Priority Register" },
-        { NT_PPC_DSCR,             "NT_PPC_DSCR", "PowerPC Data Stream Control Register" },
-        { NT_PPC_EBB,              "NT_PPC_EBB", "PowerPC Event Based Branch Registers" },
-        { NT_PPC_PMU,              "NT_PPC_PMU", "PowerPC Performance Monitor Registers" },
-        { NT_PPC_TM_CGPR,          "NT_PPC_TM_CGPR", "PowerPC TM checkpointed GPR Registers" },
-        { NT_PPC_TM_CFPR,          "NT_PPC_TM_CFPR", "PowerPC TM checkpointed FPR Registers" },
-        { NT_PPC_TM_CVMX,          "NT_PPC_TM_CVMX", "PowerPC TM checkpointed VMX Registers" },
-        { NT_PPC_TM_CVSX,          "NT_PPC_TM_CVSX", "PowerPC TM checkpointed VSX Registers" },
-        { NT_PPC_TM_SPR,           "NT_PPC_TM_SPR",   "PowerPC TM Special Purpose Registers" },
-        { NT_PPC_TM_CTAR,          "NT_PPC_TM_CTAR", "PowerPC TM checkpointed TAR" },
-        { NT_PPC_TM_CPPR,          "NT_PPC_TM_CPPR", "PowerPC TM checkpointed PPR" },
-        { NT_PPC_TM_CDSCR,         "NT_PPC_TM_CDSCR", "PowerPC TM checkpointed Data SCR" },
-        { NT_386_TLS,              "NT_386_TLS", "x86 TLS information" },
-        { NT_386_IOPERM,           "NT_386_IOPERM", "x86 io permissions" },
-        { NT_X86_XSTATE,           "NT_X86_XSTATE", "x86 XSAVE extended state" },
-        { NT_X86_CET,              "NT_X86_CET", "x86 CET state" },
-        { NT_S390_HIGH_GPRS,       "NT_S390_HIGH_GPRS", "S/390 upper halves of GPRs " },
-        { NT_S390_TIMER,           "NT_S390_TIMER", "S390 timer" },
-        { NT_S390_TODCMP,          "NT_S390_TODCMP", "S390 TOD clock comparator" },
-        { NT_S390_TODPREG,         "NT_S390_TODPREG", "S390 TOD programmable register" },
-        { NT_S390_CTRS,            "NT_S390_CTRS", "S390 control registers" },
-        { NT_S390_PREFIX,          "NT_S390_PREFIX", "S390 prefix register" },
-        { NT_S390_LAST_BREAK,      "NT_S390_LAST_BREAK", "S390 breaking event address" },
-        { NT_S390_SYSTEM_CALL,     "NT_S390_SYSTEM_CALL", "S390 system call restart data" },
-        { NT_S390_TDB,             "NT_S390_TDB", "S390 transaction diagnostic block" },
-        { NT_S390_VXRS_LOW,        "NT_S390_VXRS_LOW", "S390 vector registers 0-15 upper half" },
-        { NT_S390_VXRS_HIGH,       "NT_S390_VXRS_HIGH", "S390 vector registers 16-31" },
-        { NT_S390_GS_CB,           "NT_S390_GS_CB", "s390 guarded storage registers" },
-        { NT_S390_GS_BC,           "NT_S390_GS_BC", "s390 guarded storage broadcast control block" },
-        { NT_ARM_VFP,              "NT_ARM_VFP", "ARM VFP registers" },
-        { NT_ARM_TLS,              "NT_ARM_TLS", "AArch TLS registers" },
-        { NT_ARM_HW_BREAK,         "NT_ARM_HW_BREAK", "AArch hardware breakpoint registers" },
-        { NT_ARM_HW_WATCH,         "NT_ARM_HW_WATCH", "AArch hardware watchpoint registers" },
-        { NT_ARM_SVE,              "NT_ARM_SVE", "AArch SVE registers. " },
-        { NT_ARM_PAC_MASK,         "NT_ARM_PAC_MASK", "AArch pointer authentication code masks" },
-        { NT_ARM_PACA_KEYS,        "NT_ARM_PACA_KEYS", "ARM pointer authentication address keys" },
-        { NT_ARM_PACG_KEYS,        "NT_ARM_PACG_KEYS", "ARM pointer authentication generic keys" },
-        { NT_ARM_TAGGED_ADDR_CTRL, "NT_ARM_TAGGED_ADDR_CTRL", "AArch64 tagged address control (prctl())" },
-        { NT_ARM_PAC_ENABLED_KEYS, "NT_ARM_PAC_ENABLED_KEYS", "AArch64 pointer authentication enabled keys (prctl())" },
-        { NT_ARC_V2,               "NT_ARC_V2", "ARC HS accumulator/extra registers. " },
-        { NT_LARCH_CPUCFG,         "NT_LARCH_CPUCFG", "LoongArch CPU config registers" },
-        { NT_LARCH_CSR,            "NT_LARCH_CSR", "LoongArch Control State Registers" },
-        { NT_LARCH_LSX,            "NT_LARCH_LSX", "LoongArch SIMD eXtension registers" },
-        { NT_LARCH_LASX,           "NT_LARCH_LASX", "LoongArch Advanced SIMD eXtension registers" },
-        { NT_RISCV_CSR,            "NT_RISCV_CSR", "RISC-V Control and Status Registers" },
-      } },
-    { "CORE",
-      { { NT_LARCH_LBT, "NT_LARCH_LBT", "LoongArch Binary Translation registers" }
-      } },
-    { "FreeBSD",
-      { { NT_FREEBSD_THRMISC,            "NT_FREEBSD_THRMISC",            "Thread miscellaneous info." },
-        { NT_FREEBSD_PROCSTAT_PROC,      "NT_FREEBSD_PROCSTAT_PROC",      "Procstat proc data." },
-        { NT_FREEBSD_PROCSTAT_FILES,     "NT_FREEBSD_PROCSTAT_FILES",     "Procstat files data." },
-        { NT_FREEBSD_PROCSTAT_VMMAP,     "NT_FREEBSD_PROCSTAT_VMMAP",     "Procstat vmmap data." },
-        { NT_FREEBSD_PROCSTAT_GROUPS,    "NT_FREEBSD_PROCSTAT_GROUPS",    "Procstat groups data." },
-        { NT_FREEBSD_PROCSTAT_UMASK,     "NT_FREEBSD_PROCSTAT_UMASK",     "Procstat umask data." },
-        { NT_FREEBSD_PROCSTAT_RLIMIT,    "NT_FREEBSD_PROCSTAT_RLIMIT",    "Procstat rlimit data." },
-        { NT_FREEBSD_PROCSTAT_OSREL,     "NT_FREEBSD_PROCSTAT_OSREL",     "Procstat osreldate data." },
-        { NT_FREEBSD_PROCSTAT_PSSTRINGS, "NT_FREEBSD_PROCSTAT_PSSTRINGS", "Procstat ps_strings data." },
-        { NT_FREEBSD_PROCSTAT_AUXV,      "NT_FREEBSD_PROCSTAT_AUXV",      "Procstat auxv data." },
-        { NT_FREEBSD_PTLWPINFO,          "NT_FREEBSD_PTLWPINFO",          "Thread ptrace miscellaneous info." },
-      } },
-    { "NetBSD-CORE",
-      { { NT_NETBSDCORE_PROCINFO,  "NT_NETBSDCORE_PROCINFO",  "Has a struct procinfo" },
-        { NT_NETBSDCORE_AUXV,      "NT_NETBSDCORE_AUXV",      "Has auxv data" },
-        { NT_NETBSDCORE_LWPSTATUS, "NT_NETBSDCORE_LWPSTATUS", "Has LWPSTATUS data" },
-        { NT_NETBSDCORE_FIRSTMACH, "NT_NETBSDCORE_FIRSTMACH", "start of machdep note types" },
-      } },
-    { "OpenBSD",
-      { { NT_OPENBSD_PROCINFO, "NT_OPENBSD_PROCINFO", "" },
-        { NT_OPENBSD_AUXV,     "NT_OPENBSD_AUXV",     "" },
-        { NT_OPENBSD_REGS,     "NT_OPENBSD_REGS",     "" },
-        { NT_OPENBSD_FPREGS,   "NT_OPENBSD_FPREGS",   "" },
-        { NT_OPENBSD_XFPREGS,  "NT_OPENBSD_XFPREGS",  "" },
-        { NT_OPENBSD_WCOOKIE,  "NT_OPENBSD_WCOOKIE",  "" },
-      } },
-    { "SPU",
-      { { NT_SPU, "NT_SPU", "" }
-      } },
-    { "GNU",
-      { 
-        { NT_GNU_ABI_TAG,          "NT_GNU_ABI_TAG",         "GNU ABI tag" },
-        { NT_GNU_HWCAP,            "NT_GNU_HWCAP",           "Used by ld.so and kernel vDSO" },
-        { NT_GNU_BUILD_ID,         "NT_GNU_BUILD_ID",        "Build ID of the binary" },
-        { NT_GNU_GOLD_VERSION,     "NT_GNU_GOLD_VERSION",    "Version of GNU gold used to link the binary" },
-        { NT_GNU_PROPERTY_TYPE_0,  "NT_GNU_PROPERTY_TYPE_0", "Property type 0" },
-        // { NT_GNU_PROPERTY_TYPE_1,  "NT_GNU_PROPERTY_TYPE_1",  "Property type 1" },
-        // { NT_GNU_PROPERTY_TYPE_2,  "NT_GNU_PROPERTY_TYPE_2",  "Property type 2" },
-        // { NT_GNU_PROPERTY_TYPE_3,  "NT_GNU_PROPERTY_TYPE_3",  "Property type 3" },
-        // { NT_GNU_PROPERTY_TYPE_4,  "NT_GNU_PROPERTY_TYPE_4",  "Property type 4" },
-        // { NT_GNU_PROPERTY_TYPE_5,  "NT_GNU_PROPERTY_TYPE_5",  "Property type 5" },
-        // { NT_GNU_PROPERTY_TYPE_6,  "NT_GNU_PROPERTY_TYPE_6",  "Property type 6" },
-        // { NT_GNU_PROPERTY_TYPE_7,  "NT_GNU_PROPERTY_TYPE_7",  "Property type 7" },
-        // { NT_GNU_PROPERTY_TYPE_8,  "NT_GNU_PROPERTY_TYPE_8",  "Property type 8" },
-        // { NT_GNU_PROPERTY_TYPE_9,  "NT_GNU_PROPERTY_TYPE_9",  "Property type 9" },
-        // { NT_GNU_PROPERTY_TYPE_10, "NT_GNU_PROPERTY_TYPE_10", "Property type 10" },
-        // { NT_GNU_PROPERTY_TYPE_11, "NT_GNU_PROPERTY_TYPE_11", "Property type 11" },
-        // { NT_GNU_PROPERTY_TYPE_12, "NT_GNU_PROPERTY_TYPE_12", "Property type 12" },
-        // { NT_GNU_PROPERTY_TYPE_13, "NT_GNU_PROPERTY_TYPE_13", "Property type 13" },
-        // { NT_GNU_PROPERTY_TYPE_14, "NT_GNU_PROPERTY_TYPE_14", "Property type 14" },
-      } },
-    // { "SOLARIS",
-    //   { { NT_SOLARIS_AUXV, "NT_SOLARIS_AUXV", "" }
-    //   } },
-    // { "AIX",
-    //   { { NT_AIX_AUXV, "NT_AIX_AUXV", "" }
-    //   } },
-    // { "IRIX",
-    //   { { NT_IRIX_FPREGS, "NT_IRIX_FPREGS", "" }
-    //   } },
+
+    note_tag_t( const std::string& n, const std::vector<note_values_t>& v )
+        : name( n ), values( v )
+    {
+    }
 };
+
+static std::vector<note_tag_t> get_note_tag_table()
+{
+    std::vector<note_tag_t> table;
+    std::vector<note_tag_t::note_values_t> values;
+
+    table.emplace_back( note_tag_t( "", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PRSTATUS,     "NT_PRSTATUS",     "prstatus struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FPREGSET,     "NT_FPREGSET",     "fpregset struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PRPSINFO,     "NT_PRPSINFO",     "prpsinfo struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_TASKSTRUCT,   "NT_TASKSTRUCT",   "task struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_AUXV,         "NT_AUXV",         "Elfxx_auxv_t" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PSTATUS,      "NT_PSTATUS",      "pstatus struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FPREGS,       "NT_FPREGS",       "fpregset struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PSINFO,       "NT_PSINFO",       "psinfo struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_LWPSTATUS,    "NT_LWPSTATUS",    "lwpstatus_t struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_LWPSINFO,     "NT_LWPSINFO",     "lwpsinfo_t struct" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_WIN32PSTATUS, "NT_WIN32PSTATUS", "win32_pstatus struct" ) );
+    table.back().values.swap( values );
+
+    table.emplace_back( note_tag_t( "LINUX", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PRXFPREG,             "NT_PRXFPREG", "Contains a user_xfpregs_struct;" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_VMX,              "NT_PPC_VMX", "PowerPC Altivec/VMX registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_VSX,              "NT_PPC_VSX", "PowerPC VSX registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TAR,              "NT_PPC_TAR", "PowerPC Target Address Register" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_PPR,              "NT_PPC_PPR", "PowerPC Program Priority Register" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_DSCR,             "NT_PPC_DSCR", "PowerPC Data Stream Control Register" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_EBB,              "NT_PPC_EBB", "PowerPC Event Based Branch Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_PMU,              "NT_PPC_PMU", "PowerPC Performance Monitor Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_CGPR,          "NT_PPC_TM_CGPR", "PowerPC TM checkpointed GPR Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_CFPR,          "NT_PPC_TM_CFPR", "PowerPC TM checkpointed FPR Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_CVMX,          "NT_PPC_TM_CVMX", "PowerPC TM checkpointed VMX Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_CVSX,          "NT_PPC_TM_CVSX", "PowerPC TM checkpointed VSX Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_SPR,           "NT_PPC_TM_SPR",   "PowerPC TM Special Purpose Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_CTAR,          "NT_PPC_TM_CTAR", "PowerPC TM checkpointed TAR" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_CPPR,          "NT_PPC_TM_CPPR", "PowerPC TM checkpointed PPR" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_PPC_TM_CDSCR,         "NT_PPC_TM_CDSCR", "PowerPC TM checkpointed Data SCR" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_386_TLS,              "NT_386_TLS", "x86 TLS information" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_386_IOPERM,           "NT_386_IOPERM", "x86 io permissions" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_X86_XSTATE,           "NT_X86_XSTATE", "x86 XSAVE extended state" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_X86_CET,              "NT_X86_CET", "x86 CET state" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_HIGH_GPRS,       "NT_S390_HIGH_GPRS", "S/390 upper halves of GPRs " ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_TIMER,           "NT_S390_TIMER", "S390 timer" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_TODCMP,          "NT_S390_TODCMP", "S390 TOD clock comparator" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_TODPREG,         "NT_S390_TODPREG", "S390 TOD programmable register" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_CTRS,            "NT_S390_CTRS", "S390 control registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_PREFIX,          "NT_S390_PREFIX", "S390 prefix register" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_LAST_BREAK,      "NT_S390_LAST_BREAK", "S390 breaking event address" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_SYSTEM_CALL,     "NT_S390_SYSTEM_CALL", "S390 system call restart data" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_TDB,             "NT_S390_TDB", "S390 transaction diagnostic block" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_VXRS_LOW,        "NT_S390_VXRS_LOW", "S390 vector registers 0-15 upper half" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_VXRS_HIGH,       "NT_S390_VXRS_HIGH", "S390 vector registers 16-31" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_GS_CB,           "NT_S390_GS_CB", "s390 guarded storage registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_S390_GS_BC,           "NT_S390_GS_BC", "s390 guarded storage broadcast control block" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_VFP,              "NT_ARM_VFP", "ARM VFP registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_TLS,              "NT_ARM_TLS", "AArch TLS registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_HW_BREAK,         "NT_ARM_HW_BREAK", "AArch hardware breakpoint registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_HW_WATCH,         "NT_ARM_HW_WATCH", "AArch hardware watchpoint registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_SVE,              "NT_ARM_SVE", "AArch SVE registers. " ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_PAC_MASK,         "NT_ARM_PAC_MASK", "AArch pointer authentication code masks" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_PACA_KEYS,        "NT_ARM_PACA_KEYS", "ARM pointer authentication address keys" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_PACG_KEYS,        "NT_ARM_PACG_KEYS", "ARM pointer authentication generic keys" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_TAGGED_ADDR_CTRL, "NT_ARM_TAGGED_ADDR_CTRL", "AArch64 tagged address control (prctl())" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARM_PAC_ENABLED_KEYS, "NT_ARM_PAC_ENABLED_KEYS", "AArch64 pointer authentication enabled keys (prctl())" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_ARC_V2,               "NT_ARC_V2", "ARC HS accumulator/extra registers. " ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_LARCH_CPUCFG,         "NT_LARCH_CPUCFG", "LoongArch CPU config registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_LARCH_CSR,            "NT_LARCH_CSR", "LoongArch Control State Registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_LARCH_LSX,            "NT_LARCH_LSX", "LoongArch SIMD eXtension registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_LARCH_LASX,           "NT_LARCH_LASX", "LoongArch Advanced SIMD eXtension registers" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_RISCV_CSR,            "NT_RISCV_CSR", "RISC-V Control and Status Registers" ) );
+    table.back().values.swap( values );
+
+    table.emplace_back( note_tag_t( "CORE", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_LARCH_LBT, "NT_LARCH_LBT", "LoongArch Binary Translation registers" ) );
+    table.back().values.swap( values );
+
+    table.emplace_back( note_tag_t( "FreeBSD", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_THRMISC,            "NT_FREEBSD_THRMISC",            "Thread miscellaneous info." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_PROC,      "NT_FREEBSD_PROCSTAT_PROC",      "Procstat proc data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_FILES,     "NT_FREEBSD_PROCSTAT_FILES",     "Procstat files data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_VMMAP,     "NT_FREEBSD_PROCSTAT_VMMAP",     "Procstat vmmap data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_GROUPS,    "NT_FREEBSD_PROCSTAT_GROUPS",    "Procstat groups data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_UMASK,     "NT_FREEBSD_PROCSTAT_UMASK",     "Procstat umask data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_RLIMIT,    "NT_FREEBSD_PROCSTAT_RLIMIT",    "Procstat rlimit data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_OSREL,     "NT_FREEBSD_PROCSTAT_OSREL",     "Procstat osreldate data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_PSSTRINGS, "NT_FREEBSD_PROCSTAT_PSSTRINGS", "Procstat ps_strings data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PROCSTAT_AUXV,      "NT_FREEBSD_PROCSTAT_AUXV",      "Procstat auxv data." ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_FREEBSD_PTLWPINFO,          "NT_FREEBSD_PTLWPINFO",          "Thread ptrace miscellaneous info." ) );
+    table.back().values.swap( values );
+
+    table.emplace_back( note_tag_t( "NetBSD-CORE", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_NETBSDCORE_PROCINFO,  "NT_NETBSDCORE_PROCINFO",  "Has a struct procinfo" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_NETBSDCORE_AUXV,      "NT_NETBSDCORE_AUXV",      "Has auxv data" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_NETBSDCORE_LWPSTATUS, "NT_NETBSDCORE_LWPSTATUS", "Has LWPSTATUS data" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_NETBSDCORE_FIRSTMACH, "NT_NETBSDCORE_FIRSTMACH", "start of machdep note types" ) );
+    table.back().values.swap( values );
+
+    table.emplace_back( note_tag_t( "OpenBSD", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_OPENBSD_PROCINFO, "NT_OPENBSD_PROCINFO", "" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_OPENBSD_AUXV,     "NT_OPENBSD_AUXV",     "" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_OPENBSD_REGS,     "NT_OPENBSD_REGS",     "" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_OPENBSD_FPREGS,   "NT_OPENBSD_FPREGS",   "" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_OPENBSD_XFPREGS,  "NT_OPENBSD_XFPREGS",  "" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_OPENBSD_WCOOKIE,  "NT_OPENBSD_WCOOKIE",  "" ) );
+    table.back().values.swap( values );
+
+    table.emplace_back( note_tag_t( "SPU", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_SPU, "NT_SPU", "" ) );
+    table.back().values.swap( values );
+
+    table.emplace_back( note_tag_t( "GNU", values ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_GNU_ABI_TAG,          "NT_GNU_ABI_TAG",         "GNU ABI tag" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_GNU_HWCAP,            "NT_GNU_HWCAP",           "Used by ld.so and kernel vDSO" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_GNU_BUILD_ID,         "NT_GNU_BUILD_ID",        "Build ID of the binary" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_GNU_GOLD_VERSION,     "NT_GNU_GOLD_VERSION",    "Version of GNU gold used to link the binary" ) );
+    values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_0,  "NT_GNU_PROPERTY_TYPE_0", "Property type 0" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_1,  "NT_GNU_PROPERTY_TYPE_1",  "Property type 1" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_2,  "NT_GNU_PROPERTY_TYPE_2",  "Property type 2" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_3,  "NT_GNU_PROPERTY_TYPE_3",  "Property type 3" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_4,  "NT_GNU_PROPERTY_TYPE_4",  "Property type 4" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_5,  "NT_GNU_PROPERTY_TYPE_5",  "Property type 5" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_6,  "NT_GNU_PROPERTY_TYPE_6",  "Property type 6" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_7,  "NT_GNU_PROPERTY_TYPE_7",  "Property type 7" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_8,  "NT_GNU_PROPERTY_TYPE_8",  "Property type 8" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_9,  "NT_GNU_PROPERTY_TYPE_9",  "Property type 9" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_10, "NT_GNU_PROPERTY_TYPE_10", "Property type 10" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_11, "NT_GNU_PROPERTY_TYPE_11", "Property type 11" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_12, "NT_GNU_PROPERTY_TYPE_12", "Property type 12" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_13, "NT_GNU_PROPERTY_TYPE_13", "Property type 13" ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_GNU_PROPERTY_TYPE_14, "NT_GNU_PROPERTY_TYPE_14", "Property type 14" ) );
+    table.back().values.swap( values );
+
+    // table.emplace_back( note_tag_t( "SOLARIS", values ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_SOLARIS_AUXV, "NT_SOLARIS_AUXV", "" ) );
+    // table.back().values.swap( values );
+
+    // table.emplace_back( note_tag_t( "AIX", values ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_AIX_AUXV, "NT_AIX_AUXV", "" ) );
+    // table.back().values.swap( values );
+
+    // table.emplace_back( note_tag_t( "IRIX", values ) );
+    // values.emplace_back( note_tag_t::note_values_t( NT_IRIX_FPREGS, "NT_IRIX_FPREGS", "" ) );
+    // table.back().values.swap( values );
+
+    return table;
+}
+
+static const std::vector<note_tag_t> note_tag_table = get_note_tag_table();
 // clang-format on
 
 #define NT_LARCH_LBT 0xa04 /* LoongArch Binary Translation registers */
@@ -934,21 +965,18 @@ class dump
     {
         out << "  [" << DUMP_DEC_FORMAT( 2 ) << no << "] ";
 
-        const note_tag_t*                                      name_group;
+        std::vector<note_tag_t>::const_iterator                name_group;
         std::vector<note_tag_t::note_values_t>::const_iterator type_value;
 
-        name_group = std::find_if(
-            std::begin( note_tag_table ), std::end( note_tag_table ),
-            [&name]( const note_tag_t& entry ) { return entry.name == name; } );
-        if ( name_group != std::end( note_tag_table ) ) {
-            type_value = std::find_if(
-                name_group->values.begin(), name_group->values.end(),
-                [&type]( const note_tag_t::note_values_t& e ) {
-                    return e.type == type;
-                } );
+        name_group = std::find_if( note_tag_table.begin(), note_tag_table.end(),
+                                   match_note_tag_name( name ) );
+        if ( name_group != note_tag_table.end() ) {
+            type_value = std::find_if( name_group->values.begin(),
+                                       name_group->values.end(),
+                                       match_note_values_type( type ) );
         }
 
-        if ( name_group != std::end( note_tag_table ) &&
+        if ( name_group != note_tag_table.end() &&
              type_value != name_group->values.end() ) {
             out << DUMP_STR_FORMAT( 12 ) << name_group->name << " "
                 << DUMP_HEX0x_FORMAT( 8 ) << descsz << " "
@@ -1230,6 +1258,32 @@ class dump
 
         return ret;
     }
+
+    //------------------------------------------------------------------------------
+    struct match_note_tag_name
+    {
+        const std::string& name;
+
+        match_note_tag_name( const std::string& n ) : name( n ) {}
+
+        bool operator()( const note_tag_t& entry ) const
+        {
+            return entry.name == name;
+        }
+    };
+
+    //------------------------------------------------------------------------------
+    struct match_note_values_type
+    {
+        Elf64_Word type;
+
+        match_note_values_type( Elf64_Word t ) : type( t ) {}
+
+        bool operator()( const note_tag_t::note_values_t& e ) const
+        {
+            return e.type == type;
+        }
+    };
 
 #undef DUMP_DEC_FORMAT
 #undef DUMP_HEX0x_FORMAT
