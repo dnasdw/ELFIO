@@ -966,7 +966,7 @@ class dump
         out << "  [" << DUMP_DEC_FORMAT( 2 ) << no << "] ";
 
         std::vector<note_tag_t>::const_iterator name_group =
-            std::end( note_tag_table );
+            note_tag_table.end();
         std::vector<note_tag_t::note_values_t>::const_iterator type_value;
 
         name_group = std::find_if( note_tag_table.begin(), note_tag_table.end(),
