@@ -25,6 +25,18 @@ THE SOFTWARE.
 
 namespace ELFIO {
 
+template <class T> struct symbol_entry_impl_types;
+template <> struct symbol_entry_impl_types<Elf32_Sym>
+{
+    typedef Elf32_Addr Sym_value_type;
+    typedef Elf32_Word Sym_size_type;
+};
+template <> struct symbol_entry_impl_types<Elf64_Sym>
+{
+    typedef Elf64_Addr Sym_value_type;
+    typedef Elf_Xword  Sym_size_type;
+};
+
 //------------------------------------------------------------------------------
 template <class S> class symbol_section_accessor_template
 {
@@ -498,10 +510,12 @@ template <class S> class symbol_section_accessor_template
         const endianess_convertor& convertor = elf_file.get_convertor();
 
         T entry;
-        entry.st_name  = convertor( name );
-        entry.st_value = decltype( entry.st_value )( value );
+        entry.st_name = convertor( name );
+        entry.st_value =
+            typename symbol_entry_impl_types<T>::Sym_value_type( value );
         entry.st_value = convertor( entry.st_value );
-        entry.st_size  = decltype( entry.st_size )( size );
+        entry.st_size =
+            typename symbol_entry_impl_types<T>::Sym_size_type( size );
         entry.st_size  = convertor( entry.st_size );
         entry.st_info  = convertor( info );
         entry.st_other = convertor( other );

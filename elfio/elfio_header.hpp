@@ -60,12 +60,18 @@ class elf_header
 template <class T> struct elf_header_impl_types;
 template <> struct elf_header_impl_types<Elf32_Ehdr>
 {
+    typedef Elf32_Addr         Ehdr_entry_type;
+    typedef Elf32_Off          Ehdr_phoff_type;
+    typedef Elf32_Off          Ehdr_shoff_type;
     typedef Elf32_Phdr         Phdr_type;
     typedef Elf32_Shdr         Shdr_type;
     static const unsigned char file_class = ELFCLASS32;
 };
 template <> struct elf_header_impl_types<Elf64_Ehdr>
 {
+    typedef Elf64_Addr         Ehdr_entry_type;
+    typedef Elf64_Off          Ehdr_phoff_type;
+    typedef Elf64_Off          Ehdr_shoff_type;
     typedef Elf64_Phdr         Phdr_type;
     typedef Elf64_Shdr         Shdr_type;
     static const unsigned char file_class = ELFCLASS64;
@@ -141,11 +147,23 @@ template <class T> class elf_header_impl : public elf_header
     ELFIO_GET_SET_ACCESS( Elf_Half, machine, header.e_machine );
     ELFIO_GET_SET_ACCESS( Elf_Word, flags, header.e_flags );
     ELFIO_GET_SET_ACCESS( Elf_Half, section_name_str_index, header.e_shstrndx );
-    ELFIO_GET_SET_ACCESS( Elf64_Addr, entry, header.e_entry );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf64_Addr,
+        entry,
+        header.e_entry,
+        typename elf_header_impl_types<T>::Ehdr_entry_type );
     ELFIO_GET_SET_ACCESS( Elf_Half, sections_num, header.e_shnum );
-    ELFIO_GET_SET_ACCESS( Elf64_Off, sections_offset, header.e_shoff );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf64_Off,
+        sections_offset,
+        header.e_shoff,
+        typename elf_header_impl_types<T>::Ehdr_shoff_type );
     ELFIO_GET_SET_ACCESS( Elf_Half, segments_num, header.e_phnum );
-    ELFIO_GET_SET_ACCESS( Elf64_Off, segments_offset, header.e_phoff );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf64_Off,
+        segments_offset,
+        header.e_phoff,
+        typename elf_header_impl_types<T>::Ehdr_phoff_type );
 
   private:
     T                         header;

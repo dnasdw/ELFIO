@@ -25,6 +25,30 @@ THE SOFTWARE.
 
 namespace ELFIO {
 
+template <class T> struct relocation_entry_impl_types;
+template <> struct relocation_entry_impl_types<Elf32_Rel>
+{
+    typedef Elf32_Addr Rel_offset_type;
+    typedef Elf_Word   Rel_info_type;
+};
+template <> struct relocation_entry_impl_types<Elf32_Rela>
+{
+    typedef Elf32_Addr Rel_offset_type;
+    typedef Elf_Word   Rel_info_type;
+    typedef Elf_Sword  Rela_addend_type;
+};
+template <> struct relocation_entry_impl_types<Elf64_Rel>
+{
+    typedef Elf64_Addr Rel_offset_type;
+    typedef Elf_Xword  Rel_info_type;
+};
+template <> struct relocation_entry_impl_types<Elf64_Rela>
+{
+    typedef Elf64_Addr Rel_offset_type;
+    typedef Elf_Xword  Rel_info_type;
+    typedef Elf_Sxword Rela_addend_type;
+};
+
 template <typename T> struct get_sym_and_type;
 template <> struct get_sym_and_type<Elf32_Rel>
 {
@@ -376,7 +400,8 @@ template <class S> class relocation_section_accessor_template
         else {
             pEntry->r_info = ELF64_R_INFO( (Elf_Xword)symbol, type );
         }
-        pEntry->r_offset = decltype( pEntry->r_offset )( offset );
+        pEntry->r_offset =
+            typename relocation_entry_impl_types<T>::Rel_offset_type( offset );
         pEntry->r_offset = convertor( pEntry->r_offset );
         pEntry->r_info   = convertor( pEntry->r_info );
     }
@@ -401,8 +426,10 @@ template <class S> class relocation_section_accessor_template
         else {
             pEntry->r_info = ELF64_R_INFO( (Elf_Xword)symbol, type );
         }
-        pEntry->r_offset = decltype( pEntry->r_offset )( offset );
-        pEntry->r_addend = decltype( pEntry->r_addend )( addend );
+        pEntry->r_offset =
+            typename relocation_entry_impl_types<T>::Rel_offset_type( offset );
+        pEntry->r_addend =
+            typename relocation_entry_impl_types<T>::Rela_addend_type( addend );
         pEntry->r_offset = convertor( pEntry->r_offset );
         pEntry->r_info   = convertor( pEntry->r_info );
         pEntry->r_addend = convertor( pEntry->r_addend );
@@ -415,8 +442,10 @@ template <class S> class relocation_section_accessor_template
         const endianess_convertor& convertor = elf_file.get_convertor();
 
         T entry;
-        entry.r_offset = decltype( entry.r_offset )( offset );
-        entry.r_info   = decltype( entry.r_info )( info );
+        entry.r_offset =
+            typename relocation_entry_impl_types<T>::Rel_offset_type( offset );
+        entry.r_info =
+            typename relocation_entry_impl_types<T>::Rel_info_type( info );
         entry.r_offset = convertor( entry.r_offset );
         entry.r_info   = convertor( entry.r_info );
 
@@ -432,9 +461,12 @@ template <class S> class relocation_section_accessor_template
         const endianess_convertor& convertor = elf_file.get_convertor();
 
         T entry;
-        entry.r_offset = offset;
-        entry.r_info   = info;
-        entry.r_addend = addend;
+        entry.r_offset =
+            typename relocation_entry_impl_types<T>::Rel_offset_type( offset );
+        entry.r_info =
+            typename relocation_entry_impl_types<T>::Rel_info_type( info );
+        entry.r_addend =
+            typename relocation_entry_impl_types<T>::Rela_addend_type( addend );
         entry.r_offset = convertor( entry.r_offset );
         entry.r_info   = convertor( entry.r_info );
         entry.r_addend = convertor( entry.r_addend );

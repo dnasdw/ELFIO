@@ -30,6 +30,26 @@ THE SOFTWARE.
 
 namespace ELFIO {
 
+template <class T> struct segment_header_impl_types;
+template <> struct segment_header_impl_types<Elf32_Phdr>
+{
+    typedef Elf32_Off  Phdr_offset_type;
+    typedef Elf32_Addr Phdr_vaddr_type;
+    typedef Elf32_Addr Phdr_paddr_type;
+    typedef Elf_Word   Phdr_filesz_type;
+    typedef Elf_Word   Phdr_memsz_type;
+    typedef Elf_Word   Phdr_align_type;
+};
+template <> struct segment_header_impl_types<Elf64_Phdr>
+{
+    typedef Elf64_Off  Phdr_offset_type;
+    typedef Elf64_Addr Phdr_vaddr_type;
+    typedef Elf64_Addr Phdr_paddr_type;
+    typedef Elf_Xword  Phdr_filesz_type;
+    typedef Elf_Xword  Phdr_memsz_type;
+    typedef Elf_Xword  Phdr_align_type;
+};
+
 class segment
 {
     friend class elfio;
@@ -87,11 +107,31 @@ template <class T> class segment_impl : public segment
     // Section info functions
     ELFIO_GET_SET_ACCESS( Elf_Word, type, ph.p_type );
     ELFIO_GET_SET_ACCESS( Elf_Word, flags, ph.p_flags );
-    ELFIO_GET_SET_ACCESS( Elf_Xword, align, ph.p_align );
-    ELFIO_GET_SET_ACCESS( Elf64_Addr, virtual_address, ph.p_vaddr );
-    ELFIO_GET_SET_ACCESS( Elf64_Addr, physical_address, ph.p_paddr );
-    ELFIO_GET_SET_ACCESS( Elf_Xword, file_size, ph.p_filesz );
-    ELFIO_GET_SET_ACCESS( Elf_Xword, memory_size, ph.p_memsz );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf_Xword,
+        align,
+        ph.p_align,
+        typename segment_header_impl_types<T>::Phdr_align_type );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf64_Addr,
+        virtual_address,
+        ph.p_vaddr,
+        typename segment_header_impl_types<T>::Phdr_vaddr_type );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf64_Addr,
+        physical_address,
+        ph.p_paddr,
+        typename segment_header_impl_types<T>::Phdr_paddr_type );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf_Xword,
+        file_size,
+        ph.p_filesz,
+        typename segment_header_impl_types<T>::Phdr_filesz_type );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf_Xword,
+        memory_size,
+        ph.p_memsz,
+        typename segment_header_impl_types<T>::Phdr_memsz_type );
     ELFIO_GET_ACCESS( Elf64_Off, offset, ph.p_offset );
 
     //------------------------------------------------------------------------------
@@ -141,7 +181,8 @@ template <class T> class segment_impl : public segment
     //------------------------------------------------------------------------------
     void set_offset( Elf64_Off value ) override
     {
-        ph.p_offset   = decltype( ph.p_offset )( value );
+        ph.p_offset =
+            typename segment_header_impl_types<T>::Phdr_offset_type( value );
         ph.p_offset   = ( *convertor )( ph.p_offset );
         is_offset_set = true;
     }
@@ -196,7 +237,8 @@ template <class T> class segment_impl : public segment
                std::streampos header_offset,
                std::streampos data_offset ) override
     {
-        ph.p_offset = decltype( ph.p_offset )( data_offset );
+        ph.p_offset = typename segment_header_impl_types<T>::Phdr_offset_type(
+            data_offset );
         ph.p_offset = ( *convertor )( ph.p_offset );
         adjust_stream_size( stream, header_offset );
         stream.write( reinterpret_cast<const char*>( &ph ), sizeof( ph ) );

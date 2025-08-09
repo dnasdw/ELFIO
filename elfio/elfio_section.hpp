@@ -30,6 +30,26 @@ THE SOFTWARE.
 
 namespace ELFIO {
 
+template <class T> struct section_header_impl_types;
+template <> struct section_header_impl_types<Elf32_Shdr>
+{
+    typedef Elf_Word   Shdr_flags_type;
+    typedef Elf32_Addr Shdr_addr_type;
+    typedef Elf32_Off  Shdr_offset_type;
+    typedef Elf_Word   Shdr_size_type;
+    typedef Elf_Word   Shdr_addralign_type;
+    typedef Elf_Word   Shdr_entsize_type;
+};
+template <> struct section_header_impl_types<Elf64_Shdr>
+{
+    typedef Elf_Xword  Shdr_flags_type;
+    typedef Elf64_Addr Shdr_addr_type;
+    typedef Elf64_Off  Shdr_offset_type;
+    typedef Elf_Xword  Shdr_size_type;
+    typedef Elf_Xword  Shdr_addralign_type;
+    typedef Elf_Xword  Shdr_entsize_type;
+};
+
 class section
 {
     friend class elfio;
@@ -92,12 +112,28 @@ template <class T> class section_impl : public section
     //------------------------------------------------------------------------------
     // Section info functions
     ELFIO_GET_SET_ACCESS( Elf_Word, type, header.sh_type );
-    ELFIO_GET_SET_ACCESS( Elf_Xword, flags, header.sh_flags );
-    ELFIO_GET_SET_ACCESS( Elf_Xword, size, header.sh_size );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf_Xword,
+        flags,
+        header.sh_flags,
+        typename section_header_impl_types<T>::Shdr_flags_type );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf_Xword,
+        size,
+        header.sh_size,
+        typename section_header_impl_types<T>::Shdr_size_type );
     ELFIO_GET_SET_ACCESS( Elf_Word, link, header.sh_link );
     ELFIO_GET_SET_ACCESS( Elf_Word, info, header.sh_info );
-    ELFIO_GET_SET_ACCESS( Elf_Xword, addr_align, header.sh_addralign );
-    ELFIO_GET_SET_ACCESS( Elf_Xword, entry_size, header.sh_entsize );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf_Xword,
+        addr_align,
+        header.sh_addralign,
+        typename section_header_impl_types<T>::Shdr_addralign_type );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf_Xword,
+        entry_size,
+        header.sh_entsize,
+        typename section_header_impl_types<T>::Shdr_entsize_type );
     ELFIO_GET_SET_ACCESS( Elf_Word, name_string_offset, header.sh_name );
     ELFIO_GET_ACCESS( Elf64_Addr, address, header.sh_addr );
 
@@ -113,7 +149,8 @@ template <class T> class section_impl : public section
     //------------------------------------------------------------------------------
     void set_address( Elf64_Addr value ) override
     {
-        header.sh_addr = decltype( header.sh_addr )( value );
+        header.sh_addr =
+            typename section_header_impl_types<T>::Shdr_addr_type( value );
         header.sh_addr = ( *convertor )( header.sh_addr );
         is_address_set = true;
     }
@@ -195,7 +232,11 @@ template <class T> class section_impl : public section
     //------------------------------------------------------------------------------
   protected:
     //------------------------------------------------------------------------------
-    ELFIO_GET_SET_ACCESS( Elf64_Off, offset, header.sh_offset );
+    ELFIO_GET_SET_ACCESS_4(
+        Elf64_Off,
+        offset,
+        header.sh_offset,
+        typename section_header_impl_types<T>::Shdr_offset_type );
 
     //------------------------------------------------------------------------------
     void set_index( Elf_Half value ) override { index = value; }
@@ -227,7 +268,7 @@ template <class T> class section_impl : public section
                     ( *translator )[( *convertor )( header.sh_offset )] );
                 stream.read( data, size );
                 data[size] = 0; // Ensure data is ended with 0 to avoid oob read
-                data_size  = decltype( data_size )( size );
+                data_size  = Elf_Word( size );
             }
             else {
                 data_size = 0;
@@ -241,7 +282,9 @@ template <class T> class section_impl : public section
                std::streampos data_offset ) override
     {
         if ( 0 != get_index() ) {
-            header.sh_offset = decltype( header.sh_offset )( data_offset );
+            header.sh_offset =
+                typename section_header_impl_types<T>::Shdr_offset_type(
+                    data_offset );
             header.sh_offset = ( *convertor )( header.sh_offset );
         }
 
