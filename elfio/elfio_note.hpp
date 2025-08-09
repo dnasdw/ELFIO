@@ -164,14 +164,14 @@ class note_section_accessor_template
     std::vector<Elf_Xword> note_start_positions;
 };
 
-using note_section_accessor =
-    note_section_accessor_template<section, &section::get_size>;
-using const_note_section_accessor =
-    note_section_accessor_template<const section, &section::get_size>;
-using note_segment_accessor =
-    note_section_accessor_template<segment, &segment::get_file_size>;
-using const_note_segment_accessor =
-    note_section_accessor_template<const segment, &segment::get_file_size>;
+typedef note_section_accessor_template<section, &section::get_size>
+    note_section_accessor;
+typedef note_section_accessor_template<const section, &section::get_size>
+    const_note_section_accessor;
+typedef note_section_accessor_template<segment, &segment::get_file_size>
+    note_segment_accessor;
+typedef note_section_accessor_template<const segment, &segment::get_file_size>
+    const_note_segment_accessor;
 
 } // namespace ELFIO
 
