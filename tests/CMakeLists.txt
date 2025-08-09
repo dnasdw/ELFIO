@@ -2,7 +2,7 @@ include(FetchContent)
 
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/9a32aee22d771387c494be2d8519fbdf46a713b2.zip
+  URL https://github.com/google/googletest/archive/refs/tags/release-1.8.1.zip
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -46,6 +46,15 @@ target_link_libraries(
         elfio::elfio
         gtest_main)
 
+if(MSVC)
+    if(MSVC_VERSION EQUAL 1700)
+        target_compile_options(
+            ELFIOTest
+            PRIVATE
+                -DGTEST_HAS_TR1_TUPLE=0)
+    endif()
+endif()
+
 add_test(
     NAME
         ELFIOTest
@@ -58,3 +67,20 @@ add_dependencies(check ELFIOTest)
 
 include(GoogleTest)
 gtest_discover_tests(ELFIOTest)
+
+if(MSVC)
+    if(MSVC_VERSION LESS 1900)
+        target_compile_options(
+            gmock
+            PRIVATE
+                /wd4616
+        )
+    endif()
+    if(MSVC_VERSION LESS 1900)
+        target_compile_options(
+            gmock_main
+            PRIVATE
+                /wd4616
+        )
+    endif()
+endif()
