@@ -63,9 +63,9 @@ template <class S> class versym_section_accessor_template
     Elf_Word entries_num;
 };
 
-using versym_section_accessor = versym_section_accessor_template<section>;
-using const_versym_section_accessor =
-    versym_section_accessor_template<const section>;
+typedef versym_section_accessor_template<section> versym_section_accessor;
+typedef versym_section_accessor_template<const section>
+    const_versym_section_accessor;
 
 //------------------------------------------------------------------------------
 template <class S> class versym_r_section_accessor_template
@@ -144,9 +144,9 @@ template <class S> class versym_r_section_accessor_template
     Elf_Word     entries_num;
 };
 
-using versym_r_section_accessor = versym_r_section_accessor_template<section>;
-using const_versym_r_section_accessor =
-    versym_r_section_accessor_template<const section>;
+typedef versym_r_section_accessor_template<section> versym_r_section_accessor;
+typedef versym_r_section_accessor_template<const section>
+    const_versym_r_section_accessor;
 
 } // namespace ELFIO
 
