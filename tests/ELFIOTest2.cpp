@@ -443,7 +443,7 @@ BOOST_AUTO_TEST_CASE( gnu_version_64_le_modify )
     section*                  gnu_version_r = reader.sections[".gnu.version_r"];
     versym_r_section_accessor gnu_version_r_arr( reader, gnu_version_r );
 
-    auto       orig_entries_num = gnu_version_arr.get_entries_num();
+    Elf_Word   orig_entries_num = gnu_version_arr.get_entries_num();
     Elf64_Word i                = 0;
     for ( i = 0; i < orig_entries_num; i++ ) {
         gnu_version_arr.modify_entry( i, i + 10 );
