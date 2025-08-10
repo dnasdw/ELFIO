@@ -58,6 +58,13 @@ endif()
 # If this is the top level project, add in logic to install elfio
 if (IS_TOP_PROJECT)
     if(MSVC)
+        if(MSVC_VERSION LESS 1910)
+            target_compile_options(
+                elfio
+                INTERFACE
+                    /wd4996
+            )
+        endif()
         if(MSVC_VERSION LESS 1700)
             target_compile_options(
                 elfio
