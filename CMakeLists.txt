@@ -57,6 +57,16 @@ endif()
 
 # If this is the top level project, add in logic to install elfio
 if (IS_TOP_PROJECT)
+    if(MSVC)
+        if(MSVC_VERSION LESS 1700)
+            target_compile_options(
+                elfio
+                INTERFACE
+                    /wd4355
+            )
+        endif()
+    endif()
+
     include(CMakePackageConfigHelpers)
 
     # Create a file that includes the current project version. This will be
