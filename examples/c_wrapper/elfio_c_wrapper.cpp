@@ -277,12 +277,12 @@ Elf_Xword elfio_relocation_get_entries_num( prelocation_t prelocation )
     return prelocation->get_entries_num();
 }
 
-bool elfio_relocation_get_entry( prelocation_t  prelocation,
-                                 Elf_Xword      index,
-                                 Elf64_Addr*    offset,
-                                 Elf_Word*      symbol,
-                                 unsigned char* type,
-                                 Elf_Sxword*    addend )
+bool elfio_relocation_get_entry( prelocation_t prelocation,
+                                 Elf_Xword     index,
+                                 Elf64_Addr*   offset,
+                                 Elf_Word*     symbol,
+                                 unsigned*     type,
+                                 Elf_Sxword*   addend )
 {
     return prelocation->get_entry( index, *offset, *symbol, *type, *addend );
 }
@@ -291,7 +291,7 @@ bool elfio_relocation_set_entry( prelocation_t prelocation,
                                  Elf_Xword     index,
                                  Elf64_Addr    offset,
                                  Elf_Word      symbol,
-                                 unsigned char type,
+                                 unsigned      type,
                                  Elf_Sxword    addend )
 {
     return prelocation->set_entry( index, offset, symbol, type, addend );
@@ -300,7 +300,7 @@ bool elfio_relocation_set_entry( prelocation_t prelocation,
 void elfio_relocation_add_entry( prelocation_t prelocation,
                                  Elf64_Addr    offset,
                                  Elf_Word      symbol,
-                                 unsigned char type,
+                                 unsigned      type,
                                  Elf_Sxword    addend )
 {
     return prelocation->add_entry( offset, symbol, type, addend );

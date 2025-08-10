@@ -218,22 +218,22 @@ typedef int bool;
                                                          psection_t psection );
     void elfio_relocation_section_accessor_delete( prelocation_t prelocation );
     Elf_Xword elfio_relocation_get_entries_num( prelocation_t prelocation );
-    bool      elfio_relocation_get_entry( prelocation_t  prelocation,
-                                          Elf_Xword      index,
-                                          Elf64_Addr*    offset,
-                                          Elf_Word*      symbol,
-                                          unsigned char* type,
-                                          Elf_Sxword*    addend );
+    bool      elfio_relocation_get_entry( prelocation_t prelocation,
+                                          Elf_Xword     index,
+                                          Elf64_Addr*   offset,
+                                          Elf_Word*     symbol,
+                                          unsigned*     type,
+                                          Elf_Sxword*   addend );
     bool      elfio_relocation_set_entry( prelocation_t prelocation,
                                           Elf_Xword     index,
                                           Elf64_Addr    offset,
                                           Elf_Word      symbol,
-                                          unsigned char type,
+                                          unsigned      type,
                                           Elf_Sxword    addend );
     void      elfio_relocation_add_entry( prelocation_t prelocation,
                                           Elf64_Addr    offset,
                                           Elf_Word      symbol,
-                                          unsigned char type,
+                                          unsigned      type,
                                           Elf_Sxword    addend );
     void      elfio_relocation_swap_symbols( prelocation_t prelocation,
                                              Elf_Xword     first,
