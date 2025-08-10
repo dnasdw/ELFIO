@@ -27,6 +27,18 @@ THE SOFTWARE.
 
 namespace ELFIO {
 
+template <class T> struct dynamic_impl_types;
+template <> struct dynamic_impl_types<Elf32_Dyn>
+{
+    typedef Elf_Sword Dyn_tag_type;
+    typedef Elf_Word  Dyn_val_type;
+};
+template <> struct dynamic_impl_types<Elf64_Dyn>
+{
+    typedef Elf_Sxword Dyn_tag_type;
+    typedef Elf_Xword  Dyn_val_type;
+};
+
 //------------------------------------------------------------------------------
 template <class S> class dynamic_section_accessor_template
 {
@@ -201,7 +213,8 @@ template <class S> class dynamic_section_accessor_template
         case DT_SYMBOLIC:
         case DT_TEXTREL:
         case DT_BIND_NOW:
-            entry.d_un.d_val = convertor( decltype( entry.d_un.d_val )( 0 ) );
+            entry.d_un.d_val =
+                convertor( typename dynamic_impl_types<T>::Dyn_val_type( 0 ) );
             break;
         case DT_NEEDED:
         case DT_PLTRELSZ:
@@ -219,8 +232,8 @@ template <class S> class dynamic_section_accessor_template
         case DT_RUNPATH:
         case DT_FLAGS:
         case DT_PREINIT_ARRAYSZ:
-            entry.d_un.d_val =
-                convertor( decltype( entry.d_un.d_val )( value ) );
+            entry.d_un.d_val = convertor(
+                typename dynamic_impl_types<T>::Dyn_val_type( value ) );
             break;
         case DT_PLTGOT:
         case DT_HASH:
@@ -236,12 +249,13 @@ template <class S> class dynamic_section_accessor_template
         case DT_FINI_ARRAY:
         case DT_PREINIT_ARRAY:
         default:
-            entry.d_un.d_ptr =
-                convertor( decltype( entry.d_un.d_val )( value ) );
+            entry.d_un.d_ptr = convertor(
+                typename dynamic_impl_types<T>::Dyn_val_type( value ) );
             break;
         }
 
-        entry.d_tag = convertor( decltype( entry.d_tag )( tag ) );
+        entry.d_tag =
+            convertor( typename dynamic_impl_types<T>::Dyn_tag_type( tag ) );
 
         dynamic_section->append_data( reinterpret_cast<char*>( &entry ),
                                       sizeof( entry ) );
