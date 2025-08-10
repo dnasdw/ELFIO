@@ -1018,47 +1018,47 @@ typedef Elf_Sword Elf64_Sword;
 #define DF_STATIC_TLS 0x10
 
 // Legal values for d_tag (dynamic entry type).
-constexpr Elf_Word AT_NULL          = 0;  // End of vector
-constexpr Elf_Word AT_IGNORE        = 1;  // Entry should be ignored
-constexpr Elf_Word AT_EXECFD        = 2;  // File descriptor of program
-constexpr Elf_Word AT_PHDR          = 3;  // Program headers for program
-constexpr Elf_Word AT_PHENT         = 4;  // Size of program header entry
-constexpr Elf_Word AT_PHNUM         = 5;  // Number of program headers
-constexpr Elf_Word AT_PAGESZ        = 6;  // System page size
-constexpr Elf_Word AT_BASE          = 7;  // Base address of interpreter
-constexpr Elf_Word AT_FLAGS         = 8;  // Flags
-constexpr Elf_Word AT_ENTRY         = 9;  // Entry point of program
-constexpr Elf_Word AT_NOTELF        = 10; // Program is not ELF
-constexpr Elf_Word AT_UID           = 11; // Real uid
-constexpr Elf_Word AT_EUID          = 12; // Effective uid
-constexpr Elf_Word AT_GID           = 13; // Real gid
-constexpr Elf_Word AT_EGID          = 14; // Effective gid
-constexpr Elf_Word AT_CLKTCK        = 17; // Frequency of times()
-constexpr Elf_Word AT_PLATFORM      = 15; // String identifying platform.
-constexpr Elf_Word AT_HWCAP         = 16; // Hints about processor capabilities.
-constexpr Elf_Word AT_FPUCW         = 18; // Used FPU control word.
-constexpr Elf_Word AT_DCACHEBSIZE   = 19; // Data cache block size.
-constexpr Elf_Word AT_ICACHEBSIZE   = 20; // Instruction cache block size.
-constexpr Elf_Word AT_UCACHEBSIZE   = 21; // Unified cache block size.
-constexpr Elf_Word AT_IGNOREPPC     = 22; // Entry should be ignored.
-constexpr Elf_Word AT_SECURE        = 23; // Boolean, was exec setuid-like?
-constexpr Elf_Word AT_BASE_PLATFORM = 24; // String identifying real platforms.
-constexpr Elf_Word AT_RANDOM        = 25; // Address of 16 random bytes.
-constexpr Elf_Word AT_HWCAP2  = 26; // More hints about processor capabilities.
-constexpr Elf_Word AT_EXECFN  = 31; // Filename of executable.
-constexpr Elf_Word AT_SYSINFO = 32; // EP to the system call in the vDSO.
-constexpr Elf_Word AT_SYSINFO_EHDR = 33; // Start of the ELF header of the vDSO.
-constexpr Elf_Word AT_L1I_CACHESHAPE    = 34;
-constexpr Elf_Word AT_L1D_CACHESHAPE    = 35;
-constexpr Elf_Word AT_L2_CACHESHAPE     = 36;
-constexpr Elf_Word AT_L3_CACHESHAPE     = 37;
-constexpr Elf_Word AT_L1I_CACHESIZE     = 40;
-constexpr Elf_Word AT_L1I_CACHEGEOMETRY = 41;
-constexpr Elf_Word AT_L1D_CACHESIZE     = 42;
-constexpr Elf_Word AT_L1D_CACHEGEOMETRY = 43;
-constexpr Elf_Word AT_L2_CACHESIZE      = 44;
-constexpr Elf_Word AT_L2_CACHEGEOMETRY  = 45;
-constexpr Elf_Word AT_L3_CACHESIZE      = 46;
+#define AT_NULL          0  // End of vector
+#define AT_IGNORE        1  // Entry should be ignored
+#define AT_EXECFD        2  // File descriptor of program
+#define AT_PHDR          3  // Program headers for program
+#define AT_PHENT         4  // Size of program header entry
+#define AT_PHNUM         5  // Number of program headers
+#define AT_PAGESZ        6  // System page size
+#define AT_BASE          7  // Base address of interpreter
+#define AT_FLAGS         8  // Flags
+#define AT_ENTRY         9  // Entry point of program
+#define AT_NOTELF        10 // Program is not ELF
+#define AT_UID           11 // Real uid
+#define AT_EUID          12 // Effective uid
+#define AT_GID           13 // Real gid
+#define AT_EGID          14 // Effective gid
+#define AT_CLKTCK        17 // Frequency of times()
+#define AT_PLATFORM      15 // String identifying platform.
+#define AT_HWCAP         16 // Hints about processor capabilities.
+#define AT_FPUCW         18 // Used FPU control word.
+#define AT_DCACHEBSIZE   19 // Data cache block size.
+#define AT_ICACHEBSIZE   20 // Instruction cache block size.
+#define AT_UCACHEBSIZE   21 // Unified cache block size.
+#define AT_IGNOREPPC     22 // Entry should be ignored.
+#define AT_SECURE        23 // Boolean, was exec setuid-like?
+#define AT_BASE_PLATFORM 24 // String identifying real platforms.
+#define AT_RANDOM        25 // Address of 16 random bytes.
+#define AT_HWCAP2  26 // More hints about processor capabilities.
+#define AT_EXECFN  31 // Filename of executable.
+#define AT_SYSINFO 32 // EP to the system call in the vDSO.
+#define AT_SYSINFO_EHDR 33 // Start of the ELF header of the vDSO.
+#define AT_L1I_CACHESHAPE    34
+#define AT_L1D_CACHESHAPE    35
+#define AT_L2_CACHESHAPE     36
+#define AT_L3_CACHESHAPE     37
+#define AT_L1I_CACHESIZE     40
+#define AT_L1I_CACHEGEOMETRY 41
+#define AT_L1D_CACHESIZE     42
+#define AT_L1D_CACHEGEOMETRY 43
+#define AT_L2_CACHESIZE      44
+#define AT_L2_CACHEGEOMETRY  45
+#define AT_L3_CACHESIZE      46
 
 // ELF file header
 struct Elf32_Ehdr
