@@ -1,3 +1,3 @@
-add_subdirectory(ELFDump)
+add_subdirectory(elfdump)
 add_subdirectory(tutorial)
-add_subdirectory(Writer)
+add_subdirectory(writer)

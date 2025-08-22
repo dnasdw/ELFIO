@@ -23,7 +23,7 @@ add_library(elfio::elfio ALIAS elfio)
 target_include_directories(
     elfio
     INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../elfio>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # Enable C++11 for examples and tests
