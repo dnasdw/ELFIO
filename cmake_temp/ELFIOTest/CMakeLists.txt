@@ -1,0 +1,44 @@
+# Unit tests are written using the Boost unit test framework
+find_package(Boost REQUIRED)
+
+# Find all the binary files used for testing and copy them into the build
+# directory. This allows the test to be run from the build directory
+
+# First, create an elf_examples folder under the current build directory
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../elf_examples)
+
+# Second, glob all files under elf_examples
+file(GLOB elf_examples
+    LIST_DIRECTORIES
+        false
+    CONFIGURE_DEPENDS
+    ../../elf_examples/*)
+
+# Third, copy each file globbed to the elf_examples folder under the current
+# build directory
+foreach(example ${elf_examples})
+    configure_file(${example} ${CMAKE_CURRENT_BINARY_DIR}/../elf_examples COPYONLY)
+endforeach()
+
+add_executable(
+    ELFIOTest
+    ../../ELFIOTest/ELFIOTest.cpp
+    ../../ELFIOTest/ELFIOTest1.cpp)
+
+target_include_directories(
+    ELFIOTest
+    PRIVATE
+        ${Boost_INCLUDE_DIRS})
+
+target_link_libraries(
+    ELFIOTest
+    PRIVATE
+        elfio::elfio)
+
+add_test(
+    NAME
+        ELFIOTest
+    COMMAND
+        ${CMAKE_CURRENT_BINARY_DIR}/ELFIOTest
+    WORKING_DIRECTORY
+        ${CMAKE_CURRENT_BINARY_DIR})
