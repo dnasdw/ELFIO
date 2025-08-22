@@ -204,6 +204,23 @@ elf_hash( const unsigned char *name )
     return h;
 }
 
+inline std::string to_dec_string( uint64_t value )
+{
+    std::string str;
+
+    while ( value ) {
+        int digit = value % 10;
+        str       = char( '0' + digit ) + str;
+        value /= 10;
+    }
+
+    if ( str.empty() ) {
+        str = "0";
+    }
+
+    return str;
+}
+
 } // namespace ELFIO
 
 #endif // ELFIO_UTILS_HPP

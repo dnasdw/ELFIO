@@ -22,6 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#if defined( _MSC_VER ) && _MSC_VER < 1600
+#define default_random_engine tr1::mt19937
+#define uniform_int_distribution tr1::uniform_int
+#endif
+
 #ifdef _MSC_VER
   #define _SCL_SECURE_NO_WARNINGS
   #define ELFIO_NO_INTTYPES
@@ -37,14 +42,15 @@ using namespace ELFIO;
 
 
 bool preserve_name( const std::string& name ) {
-    static std::vector<std::string> names_to_preserve = { ".shstrtab",
-                                                           ".rodata",
-                                                           ".bss",
-                                                           ".data",
-                                                           ".text",
-                                                           ".text_vle" };
+    static std::vector<std::string> names_to_preserve;
+    names_to_preserve.push_back(".shstrtab");
+    names_to_preserve.push_back(".rodata");
+    names_to_preserve.push_back(".bss");
+    names_to_preserve.push_back(".data");
+    names_to_preserve.push_back(".text");
+    names_to_preserve.push_back(".text_vle");
 
-    for ( auto s = names_to_preserve.begin(); s != names_to_preserve.end(); ++s )
+    for ( std::vector<std::string>::iterator s = names_to_preserve.begin(); s != names_to_preserve.end(); ++s )
         if ( *s == name)
             return true;
     return false;
@@ -54,7 +60,7 @@ std::default_random_engine generator(0xe1f);
 std::uniform_int_distribution<int> distribution(0,255);
 
 void randomize_data( const std::string& filename, long offset, long size ) {
-    std::ofstream file (filename, std::ios::in|std::ios::out|std::ios::binary);
+    std::ofstream file (filename.c_str(), std::ios::in|std::ios::out|std::ios::binary);
     if ( !file )
         throw "error opening file" + filename;
     file.seekp(offset);
@@ -65,7 +71,7 @@ void randomize_data( const std::string& filename, long offset, long size ) {
 }
 
 void overwrite_data( const std::string& filename, long offset, const std::string& data ) {
-    std::ofstream file (filename, std::ios::in|std::ios::out|std::ios::binary);
+    std::ofstream file (filename.c_str(), std::ios::in|std::ios::out|std::ios::binary);
     if ( !file )
         throw "error opening file" + filename;
     file.seekp(offset);
@@ -80,9 +86,9 @@ std::string generate( int length ) {
 
     int counter = counters[length > 5 ? 5 : length ]++;
     
-    auto s = std::to_string(counter);
+    std::string s = to_dec_string(counter);
     if ( s.length() > length ) {
-        throw "String length error at " + std::to_string( counter ) + "; expecting " + std::to_string( length ) + " bytes ";
+        throw "String length error at " + to_dec_string( counter ) + "; expecting " + to_dec_string( length ) + " bytes ";
     }
 
     while (s.length() < length)
@@ -96,7 +102,7 @@ void processStringTable( const section* s, const std::string& filename ) {
     int counter = 0;
     int index = 1;
     while ( index < s->get_size() ) {
-        auto len = strlen( s->get_data()+index );
+        size_t len = strlen( s->get_data()+index );
         if ( len && !preserve_name( s->get_data()+index ))
             overwrite_data( filename, s->get_offset() + index, generate( len ));
         index += len + 1;
@@ -122,7 +128,7 @@ int main( int argc, char** argv )
             return 1;
         }
 
-        for ( auto sect = reader.sections.begin(); sect != reader.sections.end(); ++sect ) {
+        for ( std::vector<section*>::iterator sect = reader.sections.begin(); sect != reader.sections.end(); ++sect ) {
             section* s = *sect;
             if ( s->get_type() == SHT_STRTAB ) {
                 processStringTable(s, filename);
