@@ -5,19 +5,19 @@ find_package(Boost REQUIRED)
 # directory. This allows the test to be run from the build directory
 
 # First, create an elf_examples folder under the current build directory
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../elf_examples)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/elf_examples)
 
 # Second, glob all files under elf_examples
 file(GLOB elf_examples
     LIST_DIRECTORIES
         false
     CONFIGURE_DEPENDS
-    ../../elf_examples/*)
+    ../../tests/elf_examples/*)
 
 # Third, copy each file globbed to the elf_examples folder under the current
 # build directory
 foreach(example ${elf_examples})
-    configure_file(${example} ${CMAKE_CURRENT_BINARY_DIR}/../elf_examples COPYONLY)
+    configure_file(${example} ${CMAKE_CURRENT_BINARY_DIR}/elf_examples COPYONLY)
 endforeach()
 
 add_executable(
