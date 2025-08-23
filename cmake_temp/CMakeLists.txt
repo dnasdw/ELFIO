@@ -39,7 +39,7 @@ endif()
 if (ELFIO_BUILD_TESTS AND IS_TOP_PROJECT)
     # set (CMAKE_CXX_FLAGS "-Wall")
     enable_testing()
-    add_subdirectory(ELFIOTest)
+    add_subdirectory(tests)
 endif()
 
 # If this is the top level project, add in logic to install elfio

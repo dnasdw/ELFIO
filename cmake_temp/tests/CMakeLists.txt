@@ -22,8 +22,8 @@ endforeach()
 
 add_executable(
     ELFIOTest
-    ../../ELFIOTest/ELFIOTest.cpp
-    ../../ELFIOTest/ELFIOTest1.cpp)
+    ../../tests/ELFIOTest.cpp
+    ../../tests/ELFIOTest1.cpp)
 
 target_include_directories(
     ELFIOTest
