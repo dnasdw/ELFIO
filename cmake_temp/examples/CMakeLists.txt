@@ -1,3 +1,4 @@
+add_subdirectory(add_section)
 add_subdirectory(anonymizer)
 add_subdirectory(elfdump)
 add_subdirectory(tutorial)
