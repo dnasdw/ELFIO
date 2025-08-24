@@ -64,7 +64,9 @@ class elfio
 {
   public:
     //------------------------------------------------------------------------------
-    elfio() noexcept : sections( this ), segments( this )
+    elfio() noexcept
+        : sections( this ), segments( this ), header( nullptr ),
+          current_file_pos( 0 )
     {
         create( ELFCLASS32, ELFDATA2LSB );
     }
@@ -72,11 +74,11 @@ class elfio
 #if defined( _MSC_VER ) && _MSC_VER < 1600
     void compat_move( elfio& other )
     {
-        std::swap( header, other.header );
-        std::swap( sections_, other.sections_ );
-        std::swap( segments_, other.segments_ );
-        std::swap( convertor, other.convertor );
-        std::swap( addr_translator, other.addr_translator );
+        header          = std::move( other.header );
+        sections_       = std::move( other.sections_ );
+        segments_       = std::move( other.segments_ );
+        convertor       = std::move( other.convertor );
+        addr_translator = std::move( other.addr_translator );
         std::swap( current_file_pos, other.current_file_pos );
 
         other.header = nullptr;
@@ -94,8 +96,6 @@ class elfio
     elfio& operator=( const elfio& other )
     {
         if ( this != &other ) {
-            clean();
-
             compat_move( const_cast<elfio&>( other ) );
         }
         return *this;
@@ -149,7 +149,7 @@ class elfio
     elfio( const elfio& )            = delete;
     elfio& operator=( const elfio& ) = delete;
 #endif
-    ~elfio()                         = default;
+    ~elfio() {}
     // clang-format on
 
     //------------------------------------------------------------------------------
@@ -710,7 +710,10 @@ class elfio
         std::deque<segment*>  worklist;
 
         res.reserve( segments.size() );
-        for ( const auto& seg : segments ) {
+        for ( std::vector<std::unique_ptr<segment>>::iterator it =
+                  segments.begin();
+              it != segments.end(); ++it ) {
+            const std::unique_ptr<segment>& seg = *it;
             worklist.emplace_back( seg.get() );
         }
 
@@ -754,7 +757,7 @@ class elfio
     {
         for ( unsigned int i = 0; i < sections_.size(); ++i ) {
             if ( is_section_without_segment( i ) ) {
-                const auto& sec = sections_[i];
+                const std::unique_ptr<section>& sec = sections_[i];
 
                 Elf_Xword section_align = sec->get_addr_align();
                 if ( section_align > 1 &&
@@ -1111,13 +1114,13 @@ class elfio
 
     //------------------------------------------------------------------------------
   private:
-    std::unique_ptr<elf_header>           header = nullptr;
+    std::unique_ptr<elf_header>           header;
     std::vector<std::unique_ptr<section>> sections_;
     std::vector<std::unique_ptr<segment>> segments_;
     endianess_convertor                   convertor;
     address_translator                    addr_translator;
 
-    Elf_Xword current_file_pos = 0;
+    Elf_Xword current_file_pos;
 };
 
 } // namespace ELFIO
