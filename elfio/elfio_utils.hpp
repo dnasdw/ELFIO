@@ -75,6 +75,9 @@ class endianess_convertor
 {
   public:
     //------------------------------------------------------------------------------
+    endianess_convertor() : need_conversion( false ) {}
+
+    //------------------------------------------------------------------------------
     void setup( unsigned char elf_file_encoding )
     {
         need_conversion = ( elf_file_encoding != get_host_encoding() );
@@ -171,7 +174,7 @@ class endianess_convertor
     }
 
     //------------------------------------------------------------------------------
-    bool need_conversion = false;
+    bool need_conversion;
 };
 
 //------------------------------------------------------------------------------

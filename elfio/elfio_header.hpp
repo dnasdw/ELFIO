@@ -84,7 +84,7 @@ template <class T> class elf_header_impl : public elf_header
     elf_header_impl( endianess_convertor*      convertor,
                      unsigned char             encoding,
                      const address_translator* translator )
-        : convertor( convertor ), translator( translator )
+        : convertor( convertor ), translator( translator ), header()
     {
         header.e_ident[EI_MAG0]    = ELFMAG0;
         header.e_ident[EI_MAG1]    = ELFMAG1;
@@ -161,9 +161,9 @@ template <class T> class elf_header_impl : public elf_header
         typename elf_header_impl_types<T>::Ehdr_phoff_type );
 
   private:
-    T                         header     = {};
-    endianess_convertor*      convertor  = nullptr;
-    const address_translator* translator = nullptr;
+    T                         header;
+    endianess_convertor*      convertor;
+    const address_translator* translator;
 };
 
 } // namespace ELFIO

@@ -259,12 +259,12 @@ typedef int bool;
                                   Elf_Word* type,
                                   char*     name,
                                   int       name_len,
-                                  void**    desc,
+                                  char**    desc,
                                   Elf_Word* descSize );
     void     elfio_note_add_note( pnote_t     pnote,
                                   Elf_Word    type,
                                   const char* name,
-                                  const void* desc,
+                                  const char* desc,
                                   Elf_Word    descSize );
 
     //-----------------------------------------------------------------------------

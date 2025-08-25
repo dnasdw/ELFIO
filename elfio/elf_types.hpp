@@ -628,7 +628,8 @@ typedef Elf_Sword Elf64_Sword;
 /* ARM-specific NT_MEMTAG types.  */
 #define NT_MEMTAG_TYPE_AARCH_MTE 0x400 // MTE memory tags for AArch64.
 
-constexpr Elf_Word NT_STAPSDT = 3; // Note segment for SystemTap probes.
+/* Note segment for SystemTap probes.  */
+#define NT_STAPSDT 3
 
 // Note name is "FreeBSD"
 #define NT_FREEBSD_THRMISC            7  // Thread miscellaneous info.

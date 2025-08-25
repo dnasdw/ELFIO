@@ -184,8 +184,8 @@ int main( int argc, char* argv[] )
                 int      name_len = 128;
                 char*    desc;
                 Elf_Word descSize = 128;
-                elfio_note_get_note( pnote, i, &type, name, name_len,
-                                     (void**)&desc, &descSize );
+                elfio_note_get_note( pnote, i, &type, name, name_len, &desc,
+                                     &descSize );
                 // printf( "[%4d] %s %08x\n", i, name, descSize );
             }
         }
