@@ -95,7 +95,8 @@ template <class T> class section_impl : public section
     //------------------------------------------------------------------------------
     section_impl( const endianess_convertor* convertor,
                   const address_translator*  translator )
-        : convertor( convertor ), translator( translator )
+        : convertor( convertor ), translator( translator ), header(),
+          index( 0 ), data_size( 0 ), is_address_set( false ), stream_size( 0 )
     {
     }
 
@@ -234,7 +235,7 @@ template <class T> class section_impl : public section
     //------------------------------------------------------------------------------
     bool load( std::istream& stream, std::streampos header_offset ) override
     {
-        header = { 0 };
+        memset( &header, 0, sizeof( header ) );
 
         if ( translator->empty() ) {
             stream.seekg( 0, std::istream::end );
@@ -310,15 +311,15 @@ template <class T> class section_impl : public section
 
     //------------------------------------------------------------------------------
   private:
-    T                          header = { 0 };
-    Elf_Half                   index  = 0;
+    T                          header;
+    Elf_Half                   index;
     std::string                name;
     std::unique_ptr<char>      data;
-    Elf_Word                   data_size      = 0;
-    const endianess_convertor* convertor      = 0;
-    const address_translator*  translator     = 0;
-    bool                       is_address_set = false;
-    size_t                     stream_size    = 0;
+    Elf_Word                   data_size;
+    const endianess_convertor* convertor;
+    const address_translator*  translator;
+    bool                       is_address_set;
+    size_t                     stream_size;
 };
 
 } // namespace ELFIO
