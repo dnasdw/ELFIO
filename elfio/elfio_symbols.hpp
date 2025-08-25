@@ -62,7 +62,8 @@ template <class S> class symbol_section_accessor_template
     //------------------------------------------------------------------------------
     explicit symbol_section_accessor_template( const elfio& elf_file,
                                                S*           symbol_section )
-        : elf_file( elf_file ), symbol_section( symbol_section )
+        : elf_file( elf_file ), symbol_section( symbol_section ),
+          hash_section_index( 0 ), hash_section( nullptr )
     {
         hash_section       = nullptr;
         hash_section_index = 0;
@@ -596,8 +597,8 @@ template <class S> class symbol_section_accessor_template
   private:
     const elfio&   elf_file;
     S*             symbol_section;
-    Elf_Half       hash_section_index{ 0 };
-    const section* hash_section{ nullptr };
+    Elf_Half       hash_section_index;
+    const section* hash_section;
 };
 
 typedef symbol_section_accessor_template<section> symbol_section_accessor;
