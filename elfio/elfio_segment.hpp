@@ -94,7 +94,8 @@ template <class T> class segment_impl : public segment
     //------------------------------------------------------------------------------
     segment_impl( const endianess_convertor* convertor,
                   const address_translator*  translator )
-        : convertor( convertor ), translator( translator )
+        : convertor( convertor ), translator( translator ), ph(), index( 0 ),
+          stream_size( 0 ), is_offset_set( false )
     {
     }
 
@@ -255,14 +256,14 @@ template <class T> class segment_impl : public segment
 
     //------------------------------------------------------------------------------
   private:
-    T                          ph    = { 0 };
-    Elf_Half                   index = 0;
+    T                          ph;
+    Elf_Half                   index;
     std::unique_ptr<char>      data;
     std::vector<Elf_Half>      sections;
-    const endianess_convertor* convertor     = nullptr;
-    const address_translator*  translator    = nullptr;
-    size_t                     stream_size   = 0;
-    bool                       is_offset_set = false;
+    const endianess_convertor* convertor;
+    const address_translator*  translator;
+    size_t                     stream_size;
+    bool                       is_offset_set;
 };
 
 } // namespace ELFIO
