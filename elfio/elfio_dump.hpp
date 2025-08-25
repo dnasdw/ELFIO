@@ -891,7 +891,10 @@ class dump
     //------------------------------------------------------------------------------
     static void symbol_tables( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
+        for ( std::vector<std::unique_ptr<section>>::const_iterator it =
+                  reader.sections.begin();
+              it != reader.sections.end(); ++it ) { // For all sections
+            const std::unique_ptr<section>& sec = *it;
             if ( SHT_SYMTAB == sec->get_type() ||
                  SHT_DYNSYM == sec->get_type() ) {
                 const_symbol_section_accessor symbols( reader, sec.get() );
@@ -971,8 +974,11 @@ class dump
     //------------------------------------------------------------------------------
     static void notes( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
-            if ( SHT_NOTE == sec->get_type() ) {    // Look at notes
+        for ( std::vector<std::unique_ptr<section>>::const_iterator it =
+                  reader.sections.begin();
+              it != reader.sections.end(); ++it ) { // For all sections
+            const std::unique_ptr<section>& sec = *it;
+            if ( SHT_NOTE == sec->get_type() ) { // Look at notes
                 note_section_accessor notes( reader, sec.get() );
                 Elf_Word              no_notes = notes.get_notes_num();
 
@@ -1080,8 +1086,11 @@ class dump
     //------------------------------------------------------------------------------
     static void modinfo( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
-            if ( ".modinfo" == sec->get_name() ) {  // Look for the section
+        for ( std::vector<std::unique_ptr<section>>::const_iterator it =
+                  reader.sections.begin();
+              it != reader.sections.end(); ++it ) { // For all sections
+            const std::unique_ptr<section>& sec = *it;
+            if ( ".modinfo" == sec->get_name() ) { // Look for the section
                 out << "Section .modinfo" << std::endl;
 
                 const_modinfo_section_accessor modinfo( sec.get() );
@@ -1103,7 +1112,10 @@ class dump
     //------------------------------------------------------------------------------
     static void dynamic_tags( std::ostream& out, const elfio& reader )
     {
-        for ( const auto& sec : reader.sections ) { // For all sections
+        for ( std::vector<std::unique_ptr<section>>::const_iterator it =
+                  reader.sections.begin();
+              it != reader.sections.end(); ++it ) { // For all sections
+            const std::unique_ptr<section>& sec = *it;
             if ( SHT_DYNAMIC == sec->get_type() ) {
                 dynamic_section_accessor dynamic( reader, sec.get() );
 
