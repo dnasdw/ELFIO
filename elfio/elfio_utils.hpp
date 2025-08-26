@@ -312,7 +312,7 @@ inline void adjust_stream_size( std::ostream& stream, std::streamsize offset )
 class wiiu_zlib_interface
 {
     public:
-    virtual ~wiiu_zlib_interface() = default;
+    virtual ~wiiu_zlib_interface() {}
     /**
      * decompresses a RPX/RPL zlib-compressed section.
      *

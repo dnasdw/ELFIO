@@ -265,14 +265,14 @@ template <class T> class section_impl : public section
                 }
 
                 if(get_flags() & SHF_RPX_DEFLATE) {
-                    if(zlib == nullptr) {
+                    if(!zlib) {
                         std::cerr << "WARN: compressed section found but no zlib implementation provided. Skipping." << std::endl;
                         data = nullptr;
                         return false;
                     }
                     // at this point, data holds the whole compressed stream
                     Elf_Xword uncompressed_size = 0;
-                    auto decompressed_data = zlib->inflate(data.get(), convertor, size, uncompressed_size);
+                    std::unique_ptr<char[]> decompressed_data = zlib->inflate(data.get(), convertor, size, uncompressed_size);
                     if(decompressed_data == nullptr) {
                         std::cerr << "Failed to decompress section data." << std::endl;
                         data = nullptr;
@@ -330,7 +330,7 @@ template <class T> class section_impl : public section
     {
         adjust_stream_size( stream, data_offset );
 
-        if( (get_flags() & SHF_RPX_DEFLATE) && zlib != nullptr) {
+        if( (get_flags() & SHF_RPX_DEFLATE) && zlib) {
             Elf_Xword decompressed_size = get_size();
             Elf_Xword compressed_size = 0;
             std::unique_ptr<char[]> compressed_ptr = zlib->deflate(data.get(), convertor, decompressed_size, compressed_size);
@@ -349,7 +349,7 @@ template <class T> class section_impl : public section
     Elf_Word                   data_size;
     const endianess_convertor* convertor;
     const address_translator*  translator;
-    const std::shared_ptr<wiiu_zlib_interface> zlib = nullptr;
+    const std::shared_ptr<wiiu_zlib_interface> zlib;
     bool                       is_address_set;
     size_t                     stream_size;
 };

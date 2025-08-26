@@ -66,8 +66,8 @@ class elfio
   public:
     //------------------------------------------------------------------------------
     elfio() noexcept
-        : sections( this ), segments( this ), zlib(nullptr),
-          header( nullptr ), current_file_pos( 0 )
+        : sections( this ), segments( this ), zlib(), header( nullptr ),
+          current_file_pos( 0 )
     {
         create( ELFCLASS32, ELFDATA2LSB );
     }
@@ -85,9 +85,11 @@ class elfio
         segments_       = std::move( other.segments_ );
         convertor       = std::move( other.convertor );
         addr_translator = std::move( other.addr_translator );
+        zlib            = std::move( other.zlib );
         std::swap( current_file_pos, other.current_file_pos );
 
         other.header = nullptr;
+        other.zlib.reset();
         other.sections_.clear();
         other.segments_.clear();
     }
@@ -1131,7 +1133,7 @@ class elfio
     std::vector<std::unique_ptr<segment>> segments_;
     endianess_convertor                   convertor;
     address_translator                    addr_translator;
-    std::shared_ptr<wiiu_zlib_interface>  zlib = nullptr;
+    std::shared_ptr<wiiu_zlib_interface>  zlib;
 
     Elf_Xword current_file_pos;
 };
