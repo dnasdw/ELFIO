@@ -365,7 +365,7 @@ template <class T> class section_impl : public section
 
         if(get_flags() & SHF_RPX_DEFLATE) {
             Elf_Xword compressed_size = get_size();
-            auto compressed_ptr = compress_data(compressed_size);
+            std::unique_ptr<char[]> compressed_ptr = compress_data(compressed_size);
             stream.write( compressed_ptr.get(), compressed_size);
         } else {
             stream.write( get_data(), get_size() );
@@ -375,7 +375,7 @@ template <class T> class section_impl : public section
     //------------------------------------------------------------------------------
   private:
     std::unique_ptr<char[]> compress_data(Elf_Xword &size) const {
-        auto compressed = std::unique_ptr<char[]>(new char[size]);
+        std::unique_ptr<char[]> compressed = std::unique_ptr<char[]>(new char[size]);
         int z_result = 0;
         z_stream s = { 0 };
         s.zalloc = Z_NULL;
