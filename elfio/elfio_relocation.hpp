@@ -479,7 +479,7 @@ template <class S> class relocation_section_accessor_template
     //------------------------------------------------------------------------------
   private:
     const elfio& elf_file;
-    S*           relocation_section = nullptr;
+    S*           relocation_section;
 };
 
 typedef relocation_section_accessor_template<section>
