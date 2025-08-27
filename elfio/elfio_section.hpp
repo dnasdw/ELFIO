@@ -100,8 +100,9 @@ template <class T> class section_impl : public section
                   const address_translator*                     translator,
                   const std::shared_ptr<compression_interface>& compression )
         : convertor( convertor ), translator( translator ),
-          compression( compression ), header(), index( 0 ), data_size( 0 ),
-          is_address_set( false ), stream_size( 0 )
+          compression( compression ), pstream( nullptr ), header(), index( 0 ),
+          data_size( 0 ), is_address_set( false ), stream_size( 0 ),
+          is_lazy( false )
     {
     }
 
@@ -382,7 +383,7 @@ template <class T> class section_impl : public section
 
     //------------------------------------------------------------------------------
   private:
-    mutable std::istream*                        pstream = nullptr;
+    mutable std::istream*                        pstream;
     T                                            header;
     Elf_Half                                     index;
     std::string                                  name;
@@ -393,7 +394,7 @@ template <class T> class section_impl : public section
     const std::shared_ptr<compression_interface> compression;
     bool                                         is_address_set;
     size_t                                       stream_size;
-    mutable bool                                 is_lazy        = false;
+    mutable bool                                 is_lazy;
 };
 
 } // namespace ELFIO
