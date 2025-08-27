@@ -87,11 +87,11 @@ class elfio
         segments_       = std::move( other.segments_ );
         convertor       = std::move( other.convertor );
         addr_translator = std::move( other.addr_translator );
-        zlib            = std::move( other.zlib );
+        compression     = std::move( other.compression );
         std::swap( current_file_pos, other.current_file_pos );
 
         other.header = nullptr;
-        other.zlib.reset();
+        other.compression.reset();
         other.sections_.clear();
         other.segments_.clear();
     }
