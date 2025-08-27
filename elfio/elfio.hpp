@@ -69,15 +69,16 @@ class elfio
   public:
     //------------------------------------------------------------------------------
     elfio() noexcept
-        : sections( this ), segments( this ), header( nullptr ),
-          current_file_pos( 0 )
+        : sections( this ), segments( this ), pstream( nullptr ),
+          header( nullptr ), current_file_pos( 0 )
     {
         create( ELFCLASS32, ELFDATA2LSB );
     }
 
     explicit elfio( compression_interface* compression ) noexcept
         : sections( this ), segments( this ),
-          compression( std::shared_ptr<compression_interface>( compression ) )
+          compression( std::shared_ptr<compression_interface>( compression ) ),
+          pstream( nullptr )
     {
         elfio();
     }
@@ -100,8 +101,8 @@ class elfio
     }
 
     elfio( const elfio& other )
-        : sections( this ), segments( this ), header( nullptr ),
-          current_file_pos( 0 )
+        : sections( this ), segments( this ), pstream( nullptr ),
+          header( nullptr ), current_file_pos( 0 )
     {
         compat_move( const_cast<elfio&>( other ) );
     }
@@ -1155,7 +1156,7 @@ class elfio
 
     //------------------------------------------------------------------------------
   private:
-    std::ifstream*                         pstream = nullptr;
+    std::ifstream*                         pstream;
     std::unique_ptr<elf_header>            header;
     std::vector<std::unique_ptr<section>>  sections_;
     std::vector<std::unique_ptr<segment>>  segments_;
