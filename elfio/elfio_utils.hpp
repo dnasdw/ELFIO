@@ -282,7 +282,8 @@ inline std::string to_hex_string( uint64_t value )
     std::string str;
 
     while ( value ) {
-        if ( int digit = value & 0xF; digit < 0xA ) {
+        int digit = value & 0xF;
+        if ( digit < 0xA ) {
             str = char( '0' + digit ) + str;
         }
         else {
