@@ -45,8 +45,7 @@ target_link_libraries(
     ELFIOTest
     PRIVATE
     elfio::elfio
-    gtest_main
-    GTest::gtest_main)
+    gtest_main)
 
 if(MSVC)
     if(MSVC_VERSION EQUAL 1700)
