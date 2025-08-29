@@ -469,7 +469,8 @@ class elfio
     //------------------------------------------------------------------------------
     section* create_section()
     {
-        if ( auto file_class = get_class(); file_class == ELFCLASS64 ) {
+        unsigned char file_class = get_class();
+        if ( file_class == ELFCLASS64 ) {
             sections_.emplace_back(
                 new ( std::nothrow ) section_impl<Elf64_Shdr>(
                     &convertor, &addr_translator, compression ) );
@@ -493,7 +494,8 @@ class elfio
     //------------------------------------------------------------------------------
     segment* create_segment()
     {
-        if ( auto file_class = header->get_class(); file_class == ELFCLASS64 ) {
+        unsigned char file_class = header->get_class();
+        if ( file_class == ELFCLASS64 ) {
             segments_.emplace_back(
                 new ( std::nothrow )
                     segment_impl<Elf64_Phdr>( &convertor, &addr_translator ) );
@@ -556,8 +558,8 @@ class elfio
             sec->set_address( sec->get_address() );
         }
 
-        if ( Elf_Half shstrndx = get_section_name_str_index();
-             SHN_UNDEF != shstrndx ) {
+        Elf_Half shstrndx = get_section_name_str_index();
+        if ( SHN_UNDEF != shstrndx ) {
             string_section_accessor str_reader( sections[shstrndx] );
             for ( Elf_Half i = 0; i < num; ++i ) {
                 Elf_Word section_offset = sections[i]->get_name_string_offset();
@@ -788,8 +790,8 @@ class elfio
             if ( is_section_without_segment( i ) ) {
                 const std::unique_ptr<section>& sec = sections_[i];
 
-                if ( Elf_Xword section_align = sec->get_addr_align();
-                     section_align > 1 &&
+                Elf_Xword section_align = sec->get_addr_align();
+                if ( section_align > 1 &&
                      current_file_pos % section_align != 0 ) {
                     current_file_pos +=
                         section_align - current_file_pos % section_align;
@@ -1027,7 +1029,7 @@ class elfio
         }
 
         //------------------------------------------------------------------------------
-        section* operator[]( const std::string_view& name ) const
+        section* operator[]( const std::string& name ) const
         {
             section* sec = nullptr;
 
