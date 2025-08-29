@@ -46,7 +46,7 @@ THE SOFTWARE.
     }
 
 #define ELFIO_SET_ACCESS_4( TYPE, NAME, FIELD, FIELD_TYPE ) \
-    void set_##NAME( const TYPE& value ) noexcept override  \
+    void set_##NAME( const TYPE& value ) override           \
     {                                                       \
         FIELD = FIELD_TYPE( value );                        \
         FIELD = ( *convertor )( FIELD );                    \
@@ -60,15 +60,12 @@ THE SOFTWARE.
         FIELD = ( *convertor )( FIELD );                                 \
     }
 
-#define ELFIO_GET_SET_ACCESS_4( TYPE, NAME, FIELD, FIELD_TYPE ) \
-    TYPE get_##NAME() const noexcept override                   \
-    {                                                           \
-        return ( *convertor )( FIELD );                         \
-    }                                                           \
-    void set_##NAME( const TYPE& value ) noexcept override      \
-    {                                                           \
-        FIELD = FIELD_TYPE( value );                            \
-        FIELD = ( *convertor )( FIELD );                        \
+#define ELFIO_GET_SET_ACCESS_4( TYPE, NAME, FIELD, FIELD_TYPE )          \
+    TYPE get_##NAME() const override { return ( *convertor )( FIELD ); } \
+    void set_##NAME( const TYPE& value ) override                        \
+    {                                                                    \
+        FIELD = FIELD_TYPE( value );                                     \
+        FIELD = ( *convertor )( FIELD );                                 \
     }
 
 namespace ELFIO {
